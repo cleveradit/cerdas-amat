@@ -11,3 +11,4 @@ For a full understanding, start with [architecture.md](../architecture.md) and [
 | Doc | Description | Key files |
 |---|---|---|
 | [room-lobby](room-lobby.md) | Buat/join room, lobby, token kursi, reconnect, pergantian host | `apps/worker/src/room.ts`, `packages/shared/src/protocol.ts`, `apps/client/src/net/roomClient.ts` |
+| [gameplay](gameplay.md) | Mulai, soal, tali, timer, jeda, WO, hasil, kembali ke room | `apps/worker/src/room.ts`, `packages/shared/src/deck.ts`, `apps/client/src/screens/Permainan.svelte` |

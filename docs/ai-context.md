@@ -72,9 +72,10 @@ Prasyarat:
 | `pnpm install` | Pasang dependency semua workspace |
 | `pnpm dev` | `wrangler dev` (port 8787) + Vite (port 5173); buka `http://localhost:5173`, `/api` dan `/ws` di-proxy ke 8787 |
 | `pnpm test` | Vitest di semua workspace; tes Worker jalan di `workerd` lokal |
-| `pnpm typecheck` | `tsc` (shared, worker) dan `svelte-check` (client) |
+| `pnpm typecheck` | `tsc` (root/e2e, shared, worker) dan `svelte-check` (client) |
 | `pnpm lint` / `pnpm format` | ESLint + cek Prettier / tulis format Prettier |
 | `pnpm build` | Build client ke `apps/client/dist`, lalu `wrangler deploy --dry-run` untuk validasi Worker |
+| `pnpm e2e` | Playwright 2 pemain (Chromium) terhadap `pnpm dev`; pertama kali jalankan `pnpm exec playwright install chromium`. Sekitar 1,5 menit karena tes waktu habis memakai durasi 30 detik penuh |
 | `pnpm --filter @cerdas-amat/worker types` | Regenerasi `apps/worker/src/env.d.ts` setelah mengubah `wrangler.jsonc` |
 
 Catatan:

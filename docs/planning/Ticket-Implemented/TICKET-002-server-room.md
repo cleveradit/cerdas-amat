@@ -1,7 +1,7 @@
 # Implementation Plan: TICKET-002 (Server room dan lobby)
 
 **Ticket:** `TICKET-002`  
-**Status:** `READY`  
+**Status:** `DONE`  
 **Target Audience:** AI Developer Agents  
 **Depends On:** `TICKET-001` (DONE)
 
@@ -152,11 +152,11 @@ Expected:
 
 ## 8. Completion Checklist
 
-- [ ] Section 1 fully filled and status set correctly.
-- [ ] All Non-Negotiable Technical Contract items implemented.
-- [ ] Acceptance Test Matrix completed.
-- [ ] Verification commands executed successfully.
-- [ ] No out-of-scope changes introduced.
+- [x] Section 1 fully filled and status set correctly.
+- [x] All Non-Negotiable Technical Contract items implemented.
+- [x] Acceptance Test Matrix completed.
+- [x] Verification commands executed successfully.
+- [x] No out-of-scope changes introduced.
 
 ---
 
@@ -165,4 +165,5 @@ Expected:
 1. `pnpm lint`, `typecheck`, `test` (shared 17, worker 18 tes; worker dijalankan 3× tanpa flaky), dan `build` lulus.
 2. Skenario manual dijalankan otomatis dengan Chrome headless (`playwright-core` di luar repo, 3 konteks browser terpisah) terhadap `pnpm dev`: buat room, join lewat kode, saling melihat nama/karakter, ganti profil dari lobby, tab host ditutup lalu dibuka lagi (tetap host), join lewat link `?room=`, room penuh, kode tidak dikenal, host keluar → Player 2 menjadi host. 13/13 lulus.
 3. Perubahan kecil dari kontrak: pesan `room` membawa `seat` (kursi penerima), karena kursi Player 2 berubah saat host keluar tanpa `welcome` baru. PRD dan `protocol.ts` sudah memuatnya.
-4. Belum: skenario yang sama di produksi setelah merge.
+4. PR #3: CI hijau; skenario 13/13 lulus di preview.
+5. Merge ke `main`: workflow Deploy sukses; skenario 13/13 lulus di `https://cerdas-amat.radlabs.my.id`.

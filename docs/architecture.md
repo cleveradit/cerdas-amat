@@ -1,6 +1,6 @@
 # Architecture Map
 
-**Status:** Sebagian rencana. Kerangka monorepo, CI/CD (Fase 1), serta room dan lobby (Fase 2: `POST /api/rooms`, `GET /ws/:code`, Durable Object `Room`, layar menu/lobby) sudah ada. Komponen lain diturunkan dari [PRD Teknis](initiate-file/tarik-tambang-matematika-prd.md) dan wajib diverifikasi ulang terhadap kode setelah tiap fase selesai.
+**Status:** Sebagian rencana. Kerangka monorepo, CI/CD (Fase 1), room dan lobby (Fase 2), serta gameplay tanpa 3D (Fase 3: fase permainan, jeda, hasil, layar Permainan/Hasil, tes Playwright) sudah ada. Komponen lain diturunkan dari [PRD Teknis](initiate-file/tarik-tambang-matematika-prd.md) dan wajib diverifikasi ulang terhadap kode setelah tiap fase selesai.
 
 ## Summary
 

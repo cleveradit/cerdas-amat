@@ -5,12 +5,14 @@ import {
   type ClientMessage,
   type ServerMessage,
 } from '@cerdas-amat/shared';
+import { applySync } from '../game/clock';
 
 export type ConnectionStatus = 'connecting' | 'open' | 'reconnecting' | 'closed';
 
 const RETRY_DELAYS_MS = [500, 1000, 2000];
 const RETRY_STEADY_MS = 4000;
 const PING_INTERVAL_MS = 5000;
+const SYNC_INTERVAL_MS = 30_000;
 /** Close code dari server yang berarti mencoba lagi tidak ada gunanya. */
 const FINAL_CLOSE_CODES = new Set([CLOSE_ROOM_NOT_FOUND, CLOSE_ROOM_FULL, CLOSE_INVALID]);
 
@@ -31,6 +33,7 @@ export class RoomClient {
   private stopped = true;
   private retryTimer: ReturnType<typeof setTimeout> | undefined;
   private pingTimer: ReturnType<typeof setInterval> | undefined;
+  private syncTimer: ReturnType<typeof setInterval> | undefined;
 
   constructor() {
     document.addEventListener('visibilitychange', this.onVisible);
@@ -51,7 +54,7 @@ export class RoomClient {
   close(): void {
     this.stopped = true;
     clearTimeout(this.retryTimer);
-    clearInterval(this.pingTimer);
+    this.stopTimers();
     const ws = this.ws;
     this.ws = null;
     ws?.close(1000);
@@ -72,16 +75,21 @@ export class RoomClient {
       this.attempt = 0;
       this.onStatus('open');
       this.onOpen();
-      clearInterval(this.pingTimer);
+      this.stopTimers();
+      const sync = () => ws.send(JSON.stringify({ type: 'sync', t: Date.now() }));
+      sync();
       this.pingTimer = setInterval(() => ws.send('ping'), PING_INTERVAL_MS);
+      this.syncTimer = setInterval(sync, SYNC_INTERVAL_MS);
     };
     ws.onmessage = (e) => {
       if (e.data === 'pong') return;
-      this.onMessage(JSON.parse(e.data as string) as ServerMessage);
+      const msg = JSON.parse(e.data as string) as ServerMessage;
+      if (msg.type === 'sync') applySync(msg.t, msg.serverNow, Date.now());
+      else this.onMessage(msg);
     };
     ws.onclose = (e) => {
       if (this.ws !== ws) return; // socket lama yang sudah diganti
-      clearInterval(this.pingTimer);
+      this.stopTimers();
       this.ws = null;
       if (this.stopped || FINAL_CLOSE_CODES.has(e.code)) {
         this.stopped = true;
@@ -90,6 +98,11 @@ export class RoomClient {
       }
       this.scheduleRetry();
     };
+  }
+
+  private stopTimers(): void {
+    clearInterval(this.pingTimer);
+    clearInterval(this.syncTimer);
   }
 
   private scheduleRetry(): void {

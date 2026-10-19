@@ -8,7 +8,7 @@ Status meanings (`DRAFT` / `REVIEW` / `READY` / `DONE`): see [ai-context.md §5 
 
 | No | Ticket | Status | Depends On |
 |---|---|---|---|
-| 1 | [TICKET-002 — Server room dan lobby](TICKET-002-server-room.md) | `READY` | TICKET-001 (DONE) |
+| 1 | [TICKET-003 — Gameplay tanpa 3D](TICKET-003-gameplay.md) | `READY` | TICKET-002 (DONE) |
 
 Completed tickets are moved to `Ticket-Implemented/`.
 

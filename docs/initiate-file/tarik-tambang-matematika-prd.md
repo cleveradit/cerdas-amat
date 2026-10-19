@@ -122,7 +122,9 @@ interface RoomState {
   endsAt?: number;                // akhir permainan (epoch ms)
   remainingMs?: number;           // sisa waktu saat jeda
   pause?: { seat: SeatIndex; until: number };
-  result?: { winner: SeatIndex | null; reason: 'ko' | 'time' | 'wo' | 'void' };
+  // surrender = lawan menekan Keluar saat bermain; void = kedua pemain terputus
+  result?: { winner: SeatIndex | null; reason: 'ko' | 'time' | 'wo' | 'surrender' | 'void' };
+  resultAt?: number;              // awal layar hasil; dasar batas 30 detik kembali ke room
   emptySince?: number;
 }
 ```
@@ -134,7 +136,7 @@ interface RoomState {
 3. Timer disimpan sebagai `endsAt`. Client menghitung sisa waktu dari `endsAt` ditambah selisih jamnya dengan server. Akhir waktu dipicu oleh Alarm Durable Object, bukan oleh client.
 4. Jawaban salah tidak dikirim ke server, karena tidak berpengaruh ke skor. Ini juga menghemat kuota.
 
-**Persistensi:** Durable Object bisa dikeluarkan dari memori saat diam, jadi state disalin ke storage-nya setiap kali state lobby berubah (join, keluar, ganti profil, durasi, terputus) dan saat fase berubah, serta paling sering 1 kali per detik selama bermain. Perubahan lobby jarang, jadi kuota tulis tetap aman. Identitas kursi tiap koneksi (`{ seat, invalid }`: kursi dan jumlah pesan tidak valid) disimpan dengan `serializeAttachment` di WebSocket dan ikut diperbarui saat Player 2 pindah ke kursi 0, yang tidak memakai kuota tulis storage. Room dihapus total (`deleteAll`) setelah kosong 5 menit.
+**Persistensi:** Durable Object bisa dikeluarkan dari memori saat diam, jadi state disalin ke storage-nya setiap kali state lobby berubah (join, keluar, ganti profil, durasi, terputus) dan saat fase berubah, serta selama bermain saat jawaban benar jika tulisan terakhir sudah ≥ 1 detik lalu dan di setiap alarm heartbeat (tiap 5 detik). Skor yang bisa hilang saat DO dikeluarkan dari memori paling banyak 5 detik terakhir, dan DO hanya dikeluarkan saat tidak ada pesan masuk. Perubahan lobby jarang, jadi kuota tulis tetap aman. Identitas kursi tiap koneksi (`{ seat, invalid, since }`: kursi, jumlah pesan tidak valid, dan waktu tersambung sebagai dasar cek heartbeat sebelum ping pertama) disimpan dengan `serializeAttachment` di WebSocket dan ikut diperbarui saat Player 2 pindah ke kursi 0, yang tidak memakai kuota tulis storage. Room dihapus total (`deleteAll`) setelah kosong 5 menit.
 
 ## Protokol pesan
 
@@ -159,7 +161,7 @@ Client dan server bertukar pesan JSON lewat satu WebSocket per pemain; tipe semu
 | `start` | – | `lobby`, khusus host, kedua kursi terisi dan ada di lobby |
 | `answer` | `q` (nomor soal), `value` | `playing` |
 | `backToRoom` | – | `result` atau `lobby` |
-| `leave` | – | Kapan saja; saat `playing` atau `paused` berarti menyerah |
+| `leave` | – | Kapan saja; saat `countdown`, `playing`, atau `paused` berarti menyerah |
 | `sync` | `t` (jam client) | Kapan saja, untuk menghitung selisih jam |
 
 **Server ke client:**
@@ -167,14 +169,14 @@ Client dan server bertukar pesan JSON lewat satu WebSocket per pemain; tipe semu
 | Pesan | Isi | Dikirim saat |
 | --- | --- | --- |
 | `welcome` | `seat`, `token`, `room`, `serverNow` | Setelah `hello` diterima |
-| `room` | `room` (snapshot `{ code, phase, durationSec, seats }`, tiap kursi `{ name, character, connected, inLobby }`, tanpa token dan deck) dan `seat` (kursi penerima saat ini) | Setiap perubahan di lobby |
+| `room` | `room` (snapshot `{ code, phase, durationSec, seats, score, qIndex, startsAt?, endsAt?, remainingMs?, pause?, result? }`, tiap kursi `{ name, character, connected, inLobby }`, tanpa token dan deck) dan `seat` (kursi penerima saat ini) | Setiap perubahan state; pemain yang tersambung ulang menggambar ulang layar dari snapshot di `welcome`, lalu menerima `deck` mulai dari `qIndex`-nya |
 | `countdown` | `startsAt` | Host menekan Mulai |
 | `deck` | `from`, `questions` (162 soal) | Saat hitung mundur; disambung jika soal hampir habis |
 | `tug` | `score`, `by` | Setiap jawaban benar diterima |
-| `reject` | `q` | Jawaban ditolak (nomor soal kedaluwarsa) |
+| `reject` | `q`, `expected` (nomor soal yang benar menurut server) | Jawaban ditolak (fase bukan `playing`, nomor soal kedaluwarsa, atau nilai salah); client kembali ke soal `expected` |
 | `pause` | `seat`, `until`, `remainingMs` | Pemain terputus saat bermain |
 | `resume` | `endsAt` | Pemain kembali dalam 10 detik |
-| `result` | `winner`, `reason`, `score` | KO, waktu habis, WO, atau batal |
+| `result` | `winner`, `reason` (`ko`, `time`, `wo`, `surrender`, `void`), `score` | KO, waktu habis, WO, menyerah, atau batal |
 | `error` | `code`, `message` | `ROOM_NOT_FOUND`, `ROOM_FULL`, `NOT_HOST`, `INVALID_MESSAGE`, `RATE_LIMITED`, `QUOTA` |
 | `sync` | `t`, `serverNow` | Balasan `sync` |
 
@@ -236,8 +238,9 @@ Permainan berjalan di empat fase server: `countdown`, `playing`, `paused`, dan `
 | Kembali dalam 10 detik | Fase `playing`; `endsAt = sekarang + remainingMs`; `resume` dikirim |
 | Tidak kembali dalam 10 detik | Lawan menang WO |
 | Terputus keempat kalinya | Lawan langsung menang WO, tanpa jeda |
-| Kedua pemain terputus lebih dari 10 detik | Hasil `void` (batal), tanpa pemenang |
-| Menekan Keluar saat bermain atau jeda | Menyerah; lawan langsung menang WO |
+| Lawan ikut terputus selama jeda | Jeda tetap milik pemain pertama; di tenggatnya, jika keduanya masih terputus → `void` (batal), tanpa pemenang |
+| Pemilik jeda kembali, lawan masih terputus | Jeda baru untuk lawan dengan jatah jedanya sendiri; jika jatah lawan habis, pemilik jeda menang WO |
+| Menekan Keluar saat hitung mundur, bermain, atau jeda | Menyerah; lawan langsung menang dengan alasan `surrender` |
 
 **Satu alarm untuk semuanya:** Durable Object hanya punya satu alarm, jadi server selalu memasang alarm ke waktu terdekat dari `startsAt`, `endsAt`, `pause.until`, cek heartbeat (tiap 5 detik selama bermain), batas 60 detik kursi lobby, batas 30 detik layar hasil, dan batas 5 menit room kosong. Setiap alarm memproses semua tenggat yang sudah lewat, lalu memasang alarm berikutnya.
 

@@ -5,6 +5,18 @@ export type Phase = 'lobby' | 'countdown' | 'playing' | 'paused' | 'result';
 export type SeatIndex = 0 | 1; // 0 = host (kiri), 1 = Player 2 (kanan)
 export type Character = (typeof CHARACTERS)[number];
 export type Duration = (typeof DURATIONS)[number];
+/** `surrender` = lawan menekan Keluar saat bermain; `void` = kedua pemain terputus. */
+export type ResultReason = 'ko' | 'time' | 'wo' | 'surrender' | 'void';
+
+export interface Result {
+  winner: SeatIndex | null; // null = seri atau batal
+  reason: ResultReason;
+}
+
+export interface Pause {
+  seat: SeatIndex;
+  until: number;
+}
 
 export interface Seat {
   token: string; // rahasia 128-bit, untuk klaim ulang kursi
@@ -27,8 +39,9 @@ export interface RoomState {
   startsAt?: number;
   endsAt?: number;
   remainingMs?: number;
-  pause?: { seat: SeatIndex; until: number };
-  result?: { winner: SeatIndex | null; reason: 'ko' | 'time' | 'wo' | 'void' };
+  pause?: Pause;
+  result?: Result;
+  resultAt?: number; // awal layar hasil; dasar batas 30 detik kembali ke room
   emptySince?: number;
 }
 
@@ -40,9 +53,17 @@ export interface SeatView {
   inLobby: boolean;
 }
 
+/** Room seperti yang dilihat pemain: tanpa token dan deck. */
 export interface RoomSnapshot {
   code: string;
   phase: Phase;
   durationSec: Duration;
   seats: [SeatView | null, SeatView | null];
+  score: [number, number];
+  qIndex: [number, number];
+  startsAt?: number;
+  endsAt?: number;
+  remainingMs?: number;
+  pause?: Pause;
+  result?: Result;
 }
