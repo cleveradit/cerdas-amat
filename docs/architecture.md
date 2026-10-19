@@ -1,6 +1,6 @@
 # Architecture Map
 
-**Status:** Rencana — belum ada kode. Isi dokumen ini diturunkan dari [PRD Teknis](initiate-file/tarik-tambang-matematika-prd.md) dan wajib diverifikasi ulang terhadap kode setelah tiap fase selesai.
+**Status:** Sebagian rencana. Kerangka monorepo, Worker (`GET /api/health`, stub `Room`), client kosong, dan CI/CD sudah ada (Fase 1). Komponen lain diturunkan dari [PRD Teknis](initiate-file/tarik-tambang-matematika-prd.md) dan wajib diverifikasi ulang terhadap kode setelah tiap fase selesai.
 
 ## Summary
 

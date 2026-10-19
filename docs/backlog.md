@@ -76,3 +76,4 @@ Each backlog item follows this format:
 
 **Open questions (resolve during planning):**
 1. Kriteria kapan perlu upgrade ke Workers Paid.
+2. Angka kuota Durable Objects plan gratis di dasbor masih sesuai tabel kuota PRD? (dicek user di dasbor Cloudflare)
