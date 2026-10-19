@@ -21,10 +21,10 @@ All AI agents MUST read and follow these rules before proposing or implementing 
 | Realtime | WebSocket Hibernation API |
 | Validasi pesan | Valibot (skema dipakai bersama client dan server) |
 | PWA | vite-plugin-pwa |
-| Tes | Vitest, `@cloudflare/vitest-pool-workers`, Playwright |
+| Tes | Vitest, `@cloudflare/vitest-plugin`, Playwright |
 | Monorepo | pnpm workspaces |
 | Audio | Web Audio API, file MP3, aset berlisensi CC0 |
-| Runtime lokal | Node.js 22 |
+| Runtime lokal | Node.js 22, pnpm 12 |
 
 Dilarang: database eksternal, sistem akun, layanan pihak ketiga selain Cloudflare (termasuk font CDN — font di-host sendiri), dan framework UI selain Svelte.
 
@@ -53,7 +53,7 @@ Dilarang: database eksternal, sistem akun, layanan pihak ketiga selain Cloudflar
 
 **Rule 5 — Tanpa data permanen:** tidak menyimpan data pribadi di luar storage room; room dihapus (`deleteAll`) setelah kosong 5 menit.
 
-**Rule 6 — Logika murni teruji:** fungsi murni di `packages/shared` (`makeDeck`, aturan hasil, filter nama, kode room) wajib punya unit test Vitest; perilaku room wajib punya tes `@cloudflare/vitest-pool-workers`.
+**Rule 6 — Logika murni teruji:** fungsi murni di `packages/shared` (`makeDeck`, aturan hasil, filter nama, kode room) wajib punya unit test Vitest; perilaku room wajib punya tes `@cloudflare/vitest-plugin`.
 
 **Rule 7 — Target performa:** `devicePixelRatio` dibatasi 2; arena minimal 30 fps di HP Android kelas bawah. Jangan membuat konteks WebGL kedua.
 
@@ -61,20 +61,33 @@ Dilarang: database eksternal, sistem akun, layanan pihak ketiga selain Cloudflar
 
 ## 4. Local Development Environment
 
-Status: belum ada kode. Perintah build/dev/test ditetapkan oleh ticket Fase 1 (Fondasi) dan harus ditulis di sini setelah ticket itu `DONE`.
-
 Prasyarat:
-- Node.js 22 (terpasang via nvm di mesin pengembang).
-- pnpm (belum terpasang; pasang via `corepack enable` atau `npm i -g pnpm`).
-- Wrangler CLI (dipasang sebagai devDependency `apps/worker`, bukan global).
+- Node.js 22 (`.nvmrc`).
+- pnpm 12.14.0 lewat Corepack: `corepack enable` (versi diambil dari field `packageManager`).
+- Wrangler terpasang sebagai devDependency `apps/worker`, bukan global.
 - Akun Cloudflare plan gratis; secret repo `CLOUDFLARE_API_TOKEN` dan `CLOUDFLARE_ACCOUNT_ID` untuk GitHub Actions.
+
+| Perintah (dari root) | Fungsi |
+|---|---|
+| `pnpm install` | Pasang dependency semua workspace |
+| `pnpm dev` | `wrangler dev` (port 8787) + Vite (port 5173); buka `http://localhost:5173`, `/api` dan `/ws` di-proxy ke 8787 |
+| `pnpm test` | Vitest di semua workspace; tes Worker jalan di `workerd` lokal |
+| `pnpm typecheck` | `tsc` (shared, worker) dan `svelte-check` (client) |
+| `pnpm lint` / `pnpm format` | ESLint + cek Prettier / tulis format Prettier |
+| `pnpm build` | Build client ke `apps/client/dist`, lalu `wrangler deploy --dry-run` untuk validasi Worker |
+| `pnpm --filter @cerdas-amat/worker types` | Regenerasi `apps/worker/src/env.d.ts` setelah mengubah `wrangler.jsonc` |
+
+Catatan:
+- Tes 2 pemain di satu komputer: pemain kedua di jendela incognito atau profil browser lain, karena token kursi di localStorage dipakai bersama semua tab.
+- Tes di HP lewat HTTPS (PWA, Web Share, clipboard): `cloudflared tunnel --url http://localhost:5173`.
+- Data Durable Object lokal disimpan di `apps/worker/.wrangler/`; hapus folder itu untuk mengosongkan state.
 
 Lingkungan deploy:
 
 | Lingkungan | Alamat | Dideploy saat |
 |---|---|---|
-| Preview | `cerdas-amat-preview.<akun>.workers.dev` | Setiap pull request |
-| Produksi | `cerdas-amat.radlabs.my.id` | Merge ke `main` |
+| Preview | `cerdas-amat-preview.<akun>.workers.dev` | Setiap pull request (`.github/workflows/ci.yml`) |
+| Produksi | `cerdas-amat.radlabs.my.id` | Merge ke `main` (`.github/workflows/deploy.yml`) |
 
 ---
 
