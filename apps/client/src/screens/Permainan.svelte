@@ -1,9 +1,13 @@
 <script lang="ts">
-  import { KO_DIFF, type Question, type RoomSnapshot, type SeatIndex } from '@cerdas-amat/shared';
+  import type { Question, RoomSnapshot, SeatIndex } from '@cerdas-amat/shared';
   import { onDestroy } from 'svelte';
+  import Arena2D from '../components/Arena2D.svelte';
+  import Stage3D from '../components/Stage3D.svelte';
   import { serverNow } from '../game/clock';
   import { id } from '../i18n/id';
+  import { showFps, stage } from '../lib/stage.svelte';
   import type { ConnectionStatus } from '../net/roomClient';
+  import type { createArenaView } from '../three/views/arena';
 
   let {
     room,
@@ -21,14 +25,19 @@
     onLeave: () => void;
   } = $props();
 
-  /** Lebar kamera arena = 13,6 langkah (PRD keputusan no. 16). */
-  const STEP_PCT = 100 / 13.6;
+  /** Lama kotak soal berkedip hijau setelah jawaban benar. */
+  const OK_FLASH_MS = 220;
+  /** Timer berlatar merah saat sisa waktu sebanyak ini atau kurang. */
+  const LOW_TIME_MS = 10_000;
 
   let input = $state('');
   let wrong = $state(false);
   let now = $state(serverNow());
   const timer = setInterval(() => (now = serverNow()), 100);
-  onDestroy(() => clearInterval(timer));
+  onDestroy(() => {
+    clearInterval(timer);
+    clearTimeout(okTimer);
+  });
 
   const diff = $derived(room.score[0] - room.score[1]);
   const canAnswer = $derived(room.phase === 'playing' && question !== undefined);
@@ -45,10 +54,52 @@
   const pauseSec = $derived(
     room.pause ? Math.max(0, Math.ceil((room.pause.until - now) / 1000)) : 0,
   );
-  // Tangan karakter mulai 5 langkah dari zona netral; yang tertinggal terseret ke tengah.
-  const hostHand = $derived(50 + (-KO_DIFF + Math.max(0, -diff)) * STEP_PCT);
-  const p2Hand = $derived(50 + (KO_DIFF - Math.max(0, diff)) * STEP_PCT);
-  const marker = $derived(50 - diff * STEP_PCT);
+  const names = $derived<[string, string]>([room.seats[0]?.name ?? '', room.seats[1]?.name ?? '']);
+
+  let view = $state.raw<ReturnType<typeof createArenaView> | null>(null);
+  let ok = $state(false);
+  // Tiap jawaban salah membuat ulang kotak soal (blok `#key`) agar animasi goyang diputar lagi.
+  let shakes = $state(0);
+  let okTimer: ReturnType<typeof setTimeout> | undefined;
+  let lblHost = $state<HTMLSpanElement>();
+  let lblP2 = $state<HTMLSpanElement>();
+  let fps = $state(0);
+
+  $effect(() => {
+    if (!stage.current || view) return;
+    void import('../three/views/arena').then((m) => {
+      view = m.createArenaView();
+    });
+  });
+  $effect(() => {
+    view?.set({
+      diff,
+      characters: [room.seats[0]?.character ?? 'kucing', room.seats[1]?.character ?? 'kucing'],
+      result: null,
+    });
+  });
+  // Label nama mengikuti karakter tiap frame, langsung lewat DOM tanpa state Svelte.
+  $effect(() => {
+    if (!view) return;
+    const v = view;
+    v.onFrame = () => {
+      const y = v.labelY();
+      if (lblHost) lblHost.style.transform = `translate(${v.labelX(0)}px, ${y}px)`;
+      if (lblP2) lblP2.style.transform = `translate(${v.labelX(1)}px, ${y}px)`;
+      if (showFps && stage.current) fps = stage.current.fps; // berubah sekali per detik
+    };
+    return () => (v.onFrame = null);
+  });
+
+  function flashOk() {
+    ok = true;
+    clearTimeout(okTimer);
+    okTimer = setTimeout(() => (ok = false), OK_FLASH_MS);
+  }
+
+  function shake() {
+    shakes++;
+  }
 
   // Soal baru (benar, atau dikembalikan server lewat `reject`) mengosongkan kolom.
   $effect(() => {
@@ -68,8 +119,13 @@
     } else if (key === 'enter' && input) {
       const value = Number(input);
       input = '';
-      if (value === question![0] * question![1]) onCorrect(value);
-      else wrong = true;
+      if (value === question![0] * question![1]) {
+        onCorrect(value);
+        flashOk();
+      } else {
+        wrong = true;
+        shake();
+      }
     }
   }
 
@@ -101,22 +157,32 @@
 <section class="screen game" data-testid="game">
   <header class="hud">
     <span class="tag host" class:me={mySeat === 0}>
-      <strong data-testid="score-0">{room.score[0]}</strong>
-      {room.seats[0]?.name}
+      <strong class="score" data-testid="score-0">{room.score[0]}</strong>
+      <span class="tag-name">{names[0]}</span>
     </span>
-    <span class="timer" data-testid="timer">{Math.ceil(remainingMs / 1000)}</span>
+    <span
+      class="timer"
+      class:low={room.phase === 'playing' && remainingMs <= LOW_TIME_MS}
+      data-testid="timer">{Math.ceil(remainingMs / 1000)}</span
+    >
     <span class="tag p2" class:me={mySeat === 1}>
-      {room.seats[1]?.name}
-      <strong data-testid="score-1">{room.score[1]}</strong>
+      <strong class="score" data-testid="score-1">{room.score[1]}</strong>
+      <span class="tag-name">{names[1]}</span>
     </span>
   </header>
 
+  {#if stage.current === null}<p class="notice" role="status">{id.game.noWebgl}</p>{/if}
+
   <div class="arena" data-testid="arena" data-diff={diff}>
-    <div class="neutral"></div>
-    <div class="rope" style:left="{hostHand}%" style:right="{100 - p2Hand}%"></div>
-    <div class="marker" style:left="{marker}%"></div>
-    <div class="hand host" style:left="{hostHand}%">{room.seats[0]?.name}</div>
-    <div class="hand p2" style:left="{p2Hand}%">{room.seats[1]?.name}</div>
+    {#if stage.current && view}
+      <Stage3D stage={stage.current} {view} class="fill">
+        <span class="name-lbl host" bind:this={lblHost}><span>{names[0]}</span></span>
+        <span class="name-lbl p2" bind:this={lblP2}><span>{names[1]}</span></span>
+        {#if showFps}<span class="fps" data-testid="fps">{id.game.fps(fps)}</span>{/if}
+      </Stage3D>
+    {:else if stage.current === null}
+      <Arena2D {diff} {names} />
+    {/if}
     <p class="diff">{id.game.diff(Math.abs(diff))}</p>
 
     {#if countdown !== null}
@@ -128,13 +194,17 @@
     {/if}
   </div>
 
-  {#if status !== 'open'}<p role="status">{id.game.reconnecting}</p>{/if}
+  {#if status !== 'open'}<p class="muted center" role="status">{id.game.reconnecting}</p>{/if}
 
-  <div class="question" class:wrong>
-    <span data-testid="question">{question ? `${question[0]} × ${question[1]}` : '…'}</span>
-    <span>=</span>
-    <span class="answer" data-testid="answer">{input || ' '}</span>
-  </div>
+  {#key shakes}
+    <div class="qbox" class:wrong class:ok class:shake={shakes > 0}>
+      <span class="q" data-testid="question"
+        >{question ? `${question[0]} × ${question[1]}` : '…'}</span
+      >
+      <span class="eq">=</span>
+      <span class="ans" data-testid="answer">{input || ' '}</span>
+    </div>
+  {/key}
   <p class="hint" role="status">{wrong ? id.game.wrong : ' '}</p>
 
   <div class="keypad" role="group" aria-label={id.game.keypad}>
@@ -153,129 +223,229 @@
     {/each}
   </div>
 
-  <button type="button" onclick={leave}>{id.game.leave}</button>
+  <button type="button" class="link" onclick={leave}>{id.game.leave}</button>
 </section>
 
 <style>
+  .game {
+    gap: 8px;
+  }
   .hud {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 8px;
   }
-  .tag.p2 {
-    text-align: right;
+  .tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
   }
-  .tag.me {
+  .tag.p2 {
+    flex-direction: row-reverse;
+  }
+  .tag-name {
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .tag.me .tag-name {
+    font-weight: 700;
     text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+  .score {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--on-accent);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 4px 8px;
+    font-variant-numeric: tabular-nums;
+    min-width: 38px;
+    text-align: center;
+  }
+  .host .score {
+    background: var(--host);
+  }
+  .p2 .score {
+    background: var(--p2);
   }
   .timer {
-    font-size: 1.8em;
+    font-family: var(--display);
+    font-size: 28px;
+    line-height: 1;
     font-variant-numeric: tabular-nums;
+    background: var(--sun);
+    border: var(--border);
+    border-radius: 12px;
+    padding: 4px 10px;
+    min-width: 58px;
+    text-align: center;
+  }
+  .timer.low {
+    background: var(--p2);
+    color: var(--on-accent);
+  }
+  .notice {
+    background: var(--sun-soft);
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
   }
   .arena {
     position: relative;
-    height: 140px;
-    border: 2px solid #ccd;
-    border-radius: 12px;
+    height: 214px;
+    margin-inline: -16px;
+    border-block: var(--border);
     overflow: hidden;
-    background: #eef7fb;
+    background: var(--sky-gradient);
   }
-  .neutral {
+  .arena :global(.fill) {
     position: absolute;
-    left: calc(50% - 3px);
+    inset: 0;
+  }
+  .name-lbl {
+    position: absolute;
+    left: 0;
     top: 0;
-    bottom: 0;
-    width: 6px;
-    background: rgb(0 0 0 / 0.15);
+    z-index: 2;
+    pointer-events: none;
   }
-  .rope {
-    position: absolute;
-    top: 70px;
-    height: 4px;
-    background: #b5854b;
-    transition:
-      left 0.2s,
-      right 0.2s;
-  }
-  .marker {
-    position: absolute;
-    top: 56px;
-    width: 4px;
-    height: 32px;
-    margin-left: -2px;
-    background: #ffc83d;
-    transition: left 0.2s;
-  }
-  .hand {
-    position: absolute;
-    top: 30px;
-    transform: translateX(-50%);
-    font-size: 12px;
+  .name-lbl > span {
+    display: block;
+    transform: translate(-50%, -100%);
+    font: 700 11px var(--body);
+    color: var(--on-accent);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 1px 8px;
     white-space: nowrap;
-    transition: left 0.2s;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .hand.host {
-    color: #2f6fd0;
+  .name-lbl.host > span {
+    background: var(--host);
   }
-  .hand.p2 {
-    color: #dd4449;
+  .name-lbl.p2 > span {
+    background: var(--p2);
+  }
+  .fps {
+    position: absolute;
+    right: 6px;
+    top: 4px;
+    z-index: 2;
+    font: 600 11px var(--body);
+    font-variant-numeric: tabular-nums;
   }
   .diff {
     position: absolute;
-    bottom: 4px;
-    width: 100%;
-    margin: 0;
-    text-align: center;
-    font-size: 12px;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    z-index: 2;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--panel);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 1px 9px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
   .overlay {
     position: absolute;
     inset: 0;
+    z-index: 3;
     display: grid;
     place-items: center;
-    background: rgb(0 0 0 / 0.5);
-    color: #fff;
-    font-size: 3em;
+    background: var(--scrim);
+    color: var(--on-accent);
+    font-family: var(--display);
+    font-size: 64px;
+    text-shadow: 0 3px 0 var(--ink);
     text-align: center;
-    padding: 8px;
+    padding: 12px;
   }
   .overlay.small {
-    font-size: 1em;
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 15px;
+    text-shadow: none;
   }
-  .question {
+  .center {
+    text-align: center;
+  }
+  .qbox {
     display: flex;
+    align-items: center;
     justify-content: center;
     gap: 12px;
-    font-size: 2.2em;
+    align-self: center;
+    margin-top: 4px;
+    padding: 4px 14px;
+    border-radius: 14px;
+    transition: background-color 0.2s;
+  }
+  .qbox.ok {
+    background: var(--good-tint);
+  }
+  .qbox.shake {
+    animation: shake 0.32s;
+  }
+  @keyframes shake {
+    20% {
+      transform: translateX(-7px);
+    }
+    40% {
+      transform: translateX(6px);
+    }
+    60% {
+      transform: translateX(-4px);
+    }
+    80% {
+      transform: translateX(3px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .qbox.shake {
+      animation: none;
+    }
+  }
+  .q,
+  .eq,
+  .ans {
+    font-family: var(--display);
+    font-size: 40px;
+    line-height: 1.1;
     font-variant-numeric: tabular-nums;
   }
-  .question.wrong .answer {
-    color: #c22;
+  .eq {
+    color: var(--ink-2);
   }
-  .answer {
-    min-width: 2.5ch;
-    border-bottom: 3px solid currentColor;
+  .ans {
+    min-width: 72px;
     text-align: center;
+    border-bottom: 4px solid var(--ink);
+    white-space: pre;
+  }
+  .wrong .ans {
+    border-color: var(--p2);
   }
   .hint {
+    font-size: 13px;
+    color: var(--ink-2);
+    min-height: 20px;
     text-align: center;
-    margin: 0;
-    min-height: 1.2em;
-  }
-  .keypad {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 50px;
-    gap: 8px;
-  }
-  .key {
-    font-size: 1.3em;
-  }
-  .key.enter {
-    grid-row: span 2;
-  }
-  .key.zero {
-    grid-column: span 3;
+    white-space: pre;
   }
 </style>

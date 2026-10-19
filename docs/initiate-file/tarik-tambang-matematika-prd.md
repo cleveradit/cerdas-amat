@@ -270,12 +270,16 @@ Client adalah single-page app Svelte dengan satu canvas WebGL bersama; layar ber
 - Karakter digambar sekitar 1,5 langkah lebarnya dan boleh melewati batas langkah; ukuran model tidak memengaruhi jarak tali.
 - Pose Diam dipakai di mode Putar, thumbnail avatar, slot karakter di lobby, dan layar hasil saat seri. Di arena selama bermain: Menarik saat unggul atau seri, Terseret saat tertinggal.
 - `devicePixelRatio` dibatasi 2. Target: 60 fps di HP kelas menengah dan minimal 30 fps di HP Android kelas bawah.
+- Kalibrasi warna ke preview (Three.js r128): `ColorManagement.enabled = false`, `outputColorSpace = LinearSRGBColorSpace`, dan intensitas lampu preview dikali `Math.PI` (r155 menghapus mode lampu lama). Hasilnya avatar identik piksel dengan preview.
+- Three.js di-import dinamis setelah menu tampil, jadi layar pertama tidak menunggu modul 3D. Tanpa WebGL, permainan memakai tali 2D dan menampilkan pesan singkat.
+
+**Gaya UI:** semua layar mengikuti gaya preview karakter: garis tinta 3 px (`#1F2A33`), bayangan keras `0 3px 0`, latar langit, aksen kuning untuk tombol utama, biru untuk host, merah untuk Player 2. Hanya tema terang. Token warna dan gaya dasar tombol, input, kartu, modal, dan keypad ada di `apps/client/src/styles/theme.css`; layar hanya memakai token itu. Font: Lilita One untuk judul, angka, dan keypad; Rubik (400–700) untuk teks.
 
 **Audio:** Web Audio API lewat wrapper kecil, dengan file MP3 supaya jalan di semua browser. Suara baru bisa diputar setelah ketukan pertama pemain (aturan autoplay browser), jadi audio dibuka di tombol pertama yang ditekan di menu utama.
 
 **PWA:** `vite-plugin-pwa` membuat manifest (`display: standalone`, `orientation: portrait`, ikon 192 dan 512 px) dan service worker yang menyimpan aset di cache. Game tetap butuh internet; tanpa koneksi, menu utama menampilkan "Butuh koneksi internet untuk bermain".
 
-**Penyimpanan lokal:** nama, karakter, volume musik dan efek suara, serta token kursi per kode room. Semua teks antarmuka ada di `apps/client/src/i18n/id.ts`. Font di-host sendiri bersama aset supaya tidak bergantung pada server lain.
+**Penyimpanan lokal:** nama, karakter, volume musik dan efek suara, serta token kursi per kode room. Semua teks antarmuka ada di `apps/client/src/i18n/id.ts`. Font di-host sendiri bersama aset (paket `@fontsource/lilita-one` dan `@fontsource/rubik` yang di-bundle Vite) supaya tidak bergantung pada server lain.
 
 ## Keamanan dan batas penyalahgunaan
 
@@ -390,8 +394,8 @@ Pembangunan dibagi 6 fase berurutan; tiap fase punya satu syarat lolos sebelum f
     - Lolos: dua tab browser masuk lobby yang sama dan saling melihat nama serta karakter.
 3. **Gameplay tanpa 3D.** Hitung mundur, deck, keypad, timer, KO, hasil, jeda dan WO, kembali ke room. Tali digambar sementara dengan garis 2D sederhana.
     - Lolos: tes Playwright memainkan pertandingan penuh sampai KO dan sampai waktu habis.
-4. **Visual.** Memindahkan 5 karakter dari preview, arena 3D, layar pilih karakter, pose Menang, Kalah, dan Diam (seri) di layar hasil.
-    - Lolos: arena minimal 30 fps di HP Android kelas bawah.
+4. **Visual.** Memindahkan 5 karakter dari preview, arena 3D, layar pilih karakter, pose Menang, Kalah, dan Diam (seri) di layar hasil, serta gaya UI umum semua layar (menu, modal Play, pilih karakter, lobby, permainan, hasil) mengikuti preview.
+    - Lolos: `pnpm perf` (Chromium lokal, layar 360×740, DPR 2, CPU diperlambat 6×, 10 detik arena di tengah pertandingan) memberi rata-rata minimal 30 fps dan tidak ada detik di bawah 25 fps. Uji di HP Android nyata dilakukan di fase Rilis.
 5. **Pelengkap.** Audio, PWA, filter nama, batas penyalahgunaan, pesan kuota habis, tombol Bagikan.
     - Lolos: semua kriteria penerimaan tercentang.
 6. **Rilis.** Uji di perangkat nyata, rilis publik, pantau pemakaian kuota setiap hari di minggu pertama.

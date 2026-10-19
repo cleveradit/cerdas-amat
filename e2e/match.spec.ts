@@ -1,5 +1,11 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 
+// Konteks dari `browser.newContext()` tidak ditutup otomatis; tanpa ini halaman tes sebelumnya
+// tetap merender arena 3D dan memperlambat tes berikutnya.
+test.afterEach(async ({ browser }) => {
+  for (const context of browser.contexts()) await context.close();
+});
+
 /** Dua pemain di konteks browser terpisah (seperti dua HP), sudah di lobby yang sama. */
 async function twoPlayers(browser: Browser, duration?: 30 | 60) {
   const host = await (await browser.newContext()).newPage();

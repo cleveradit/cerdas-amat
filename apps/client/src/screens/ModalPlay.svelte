@@ -37,17 +37,21 @@
 </script>
 
 <div class="backdrop">
-  <div class="modal" role="dialog" aria-modal="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="play-title">
+    <h2 id="play-title">{id.play.title}</h2>
     {#if mode === 'choose'}
-      <button type="button" disabled={pending} onclick={onCreate}>{id.play.create}</button>
+      <button type="button" class="primary" disabled={pending} onclick={onCreate}>
+        {id.play.create}
+      </button>
       <button type="button" disabled={pending} onclick={() => (mode = 'join')}>
         {id.play.join}
       </button>
     {:else}
-      <form onsubmit={submit}>
-        <label for="room-code">{id.play.codeLabel}</label>
+      <form class="stack" onsubmit={submit}>
+        <label class="field-label" for="room-code">{id.play.codeLabel}</label>
         <input
           id="room-code"
+          class="code-input"
           bind:value={code}
           maxlength={ROOM_CODE_LENGTH}
           placeholder={id.play.codePlaceholder}
@@ -55,14 +59,28 @@
           autocapitalize="characters"
           spellcheck="false"
         />
-        <button type="submit" disabled={pending}>{id.play.submitJoin}</button>
+        <button type="submit" class="primary" disabled={pending}>{id.play.submitJoin}</button>
       </form>
       <button type="button" disabled={pending} onclick={() => (mode = 'choose')}>
         {id.play.back}
       </button>
     {/if}
-    {#if pending}<p>{id.play.connecting}</p>{/if}
+    {#if pending}<p class="muted" role="status">{id.play.connecting}</p>{/if}
     {#if localError ?? error}<p class="error" role="alert">{localError ?? error}</p>{/if}
-    <button type="button" onclick={onClose}>{id.play.close}</button>
+    <button type="button" class="link" onclick={onClose}>{id.play.close}</button>
   </div>
 </div>
+
+<style>
+  .code-input {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 28px;
+    letter-spacing: 0.2em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  p {
+    text-align: center;
+  }
+</style>
