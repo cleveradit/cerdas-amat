@@ -15,9 +15,4 @@ describe('Worker', () => {
     expect(res.status).toBe(404);
     expect(await res.json()).toEqual({ error: 'NOT_FOUND' });
   });
-
-  it('path /ws/* belum tersedia membalas 404', async () => {
-    const res = await fetchWorker('/ws/ABCDE');
-    expect(res.status).toBe(404);
-  });
 });

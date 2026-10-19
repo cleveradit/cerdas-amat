@@ -134,18 +134,20 @@ interface RoomState {
 3. Timer disimpan sebagai `endsAt`. Client menghitung sisa waktu dari `endsAt` ditambah selisih jamnya dengan server. Akhir waktu dipicu oleh Alarm Durable Object, bukan oleh client.
 4. Jawaban salah tidak dikirim ke server, karena tidak berpengaruh ke skor. Ini juga menghemat kuota.
 
-**Persistensi:** Durable Object bisa dikeluarkan dari memori saat diam, jadi state disalin ke storage-nya saat fase berubah, dan paling sering 1 kali per detik selama bermain. Identitas kursi tiap koneksi disimpan dengan `serializeAttachment` di WebSocket, yang tidak memakai kuota tulis storage. Room dihapus total (`deleteAll`) setelah kosong 5 menit.
+**Persistensi:** Durable Object bisa dikeluarkan dari memori saat diam, jadi state disalin ke storage-nya setiap kali state lobby berubah (join, keluar, ganti profil, durasi, terputus) dan saat fase berubah, serta paling sering 1 kali per detik selama bermain. Perubahan lobby jarang, jadi kuota tulis tetap aman. Identitas kursi tiap koneksi (`{ seat, invalid }`: kursi dan jumlah pesan tidak valid) disimpan dengan `serializeAttachment` di WebSocket dan ikut diperbarui saat Player 2 pindah ke kursi 0, yang tidak memakai kuota tulis storage. Room dihapus total (`deleteAll`) setelah kosong 5 menit.
 
 ## Protokol pesan
 
-Client dan server bertukar pesan JSON lewat satu WebSocket per pemain; tipe semua pesan ada di `packages/shared` dan divalidasi skema di server. Pesan lebih dari 1 KB atau tidak valid ditolak; koneksi ditutup setelah 5 pesan tidak valid.
+Client dan server bertukar pesan JSON lewat satu WebSocket per pemain; tipe semua pesan ada di `packages/shared` dan divalidasi skema di server. Pesan lebih dari 1 KB atau tidak valid dibalas `error INVALID_MESSAGE`; koneksi ditutup dengan close code `4400` setelah 5 pesan tidak valid.
+
+**Close code aplikasi:** `4400` (pesan tidak valid), `4404` (room tidak ditemukan), `4409` (room penuh). Client berhenti mencoba tersambung ulang saat menerima salah satunya.
 
 **Endpoint HTTP:**
 
 | Endpoint | Fungsi | Balasan |
 | --- | --- | --- |
-| `POST /api/rooms` | Membuat room baru | `{ code }`, atau 429 jika melewati batas |
-| `GET /ws/:code` | Upgrade ke WebSocket room | 101, atau 404 jika room tidak ada |
+| `POST /api/rooms` | Membuat room baru | `200 { code }`; 503 `{ error: "TRY_AGAIN" }` jika 5 kode acak bentrok; 429 jika melewati batas |
+| `GET /ws/:code` | Upgrade ke WebSocket room | 101; 404 jika format kode tidak sah (DO tidak dipanggil); 426 tanpa header `Upgrade`. Room yang tidak ada tetap 101, lalu `error ROOM_NOT_FOUND` dan close `4404`, karena browser tidak bisa membaca status HTTP dari upgrade yang gagal |
 
 **Client ke server:**
 
@@ -165,7 +167,7 @@ Client dan server bertukar pesan JSON lewat satu WebSocket per pemain; tipe semu
 | Pesan | Isi | Dikirim saat |
 | --- | --- | --- |
 | `welcome` | `seat`, `token`, `room`, `serverNow` | Setelah `hello` diterima |
-| `room` | Snapshot room tanpa token dan deck | Setiap perubahan di lobby |
+| `room` | `room` (snapshot `{ code, phase, durationSec, seats }`, tiap kursi `{ name, character, connected, inLobby }`, tanpa token dan deck) dan `seat` (kursi penerima saat ini) | Setiap perubahan di lobby |
 | `countdown` | `startsAt` | Host menekan Mulai |
 | `deck` | `from`, `questions` (162 soal) | Saat hitung mundur; disambung jika soal hampir habis |
 | `tug` | `score`, `by` | Setiap jawaban benar diterima |
@@ -173,7 +175,7 @@ Client dan server bertukar pesan JSON lewat satu WebSocket per pemain; tipe semu
 | `pause` | `seat`, `until`, `remainingMs` | Pemain terputus saat bermain |
 | `resume` | `endsAt` | Pemain kembali dalam 10 detik |
 | `result` | `winner`, `reason`, `score` | KO, waktu habis, WO, atau batal |
-| `error` | `code`, `message` | `ROOM_NOT_FOUND`, `ROOM_FULL`, `NOT_HOST`, `RATE_LIMITED`, `QUOTA` |
+| `error` | `code`, `message` | `ROOM_NOT_FOUND`, `ROOM_FULL`, `NOT_HOST`, `INVALID_MESSAGE`, `RATE_LIMITED`, `QUOTA` |
 | `sync` | `t`, `serverNow` | Balasan `sync` |
 
 Deck dikirim 162 soal sekaligus (dua kali 81, sambungannya tetap mematuhi aturan berurutan) supaya client bisa menampilkan soal berikutnya tanpa menunggu jaringan. Kalau pemain melewati soal ke-150, server mengirim 81 soal lanjutan.
@@ -189,7 +191,7 @@ Satu room = satu Durable Object yang dinamai dari kodenya (`idFromName(code)`), 
 **Membuat dan bergabung:**
 
 1. Buat Room: `POST /api/rooms` mengembalikan kode, client membuka `/ws/:code`, mengirim `hello`, dan mendapat kursi 0 (host).
-2. Join Room: lewat input kode atau link `https://cerdas-amat.radlabs.my.id/?room=KODE`. Room kosong di kursi 1 memberi kursi itu; room penuh membalas `ROOM_FULL`; Durable Object yang belum pernah di-`init()` membalas `ROOM_NOT_FOUND` tanpa menyimpan apa pun.
+2. Join Room: lewat input kode atau link `https://cerdas-amat.radlabs.my.id/?room=KODE`. Room kosong di kursi 1 memberi kursi itu; room penuh membalas `ROOM_FULL` lalu close `4409`; Durable Object yang belum pernah di-`init()` membalas `ROOM_NOT_FOUND` lalu close `4404`, tanpa menyimpan apa pun.
 3. Tombol Bagikan memakai Web Share API dengan link room; browser tanpa Web Share menyalin link ke clipboard.
 
 **Token kursi:** `welcome` membawa token 128-bit (`crypto.randomUUID()`). Client menyimpannya di localStorage per kode room. Koneksi baru yang mengirim token yang cocok mengambil kembali kursi itu, sekalipun koneksi lama belum ditutup.
