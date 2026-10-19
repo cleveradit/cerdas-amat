@@ -8,7 +8,8 @@ Status meanings (`DRAFT` / `REVIEW` / `READY` / `DONE`): see [ai-context.md §5 
 
 | No | Ticket | Status | Depends On |
 |---|---|---|---|
-| 1 | [TICKET-004 — Visual](TICKET-004-visual.md) | `READY` | TICKET-003 (DONE) |
+| 1 | [TICKET-005 Keamanan, Kuota, dan Bagikan](TICKET-005-keamanan-bagikan.md) | `READY` | TICKET-004 |
+| 2 | [TICKET-006 Audio, Pengaturan, dan PWA](TICKET-006-audio-pwa.md) | `READY` | TICKET-005 |
 
 Completed tickets are moved to `Ticket-Implemented/`.
 

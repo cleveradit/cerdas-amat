@@ -27,17 +27,6 @@ Each backlog item follows this format:
 
 <!-- ADD BACKLOG ITEMS BELOW -->
 
-## Fase 5 — Pelengkap
-
-**Status:** `OPEN`
-
-**Summary:** Audio (2 musik, 8 efek suara), PWA, filter nama, batas penyalahgunaan, pesan kuota habis, dan tombol Bagikan. Syarat lolos: semua kriteria penerimaan PRD tercentang.
-
-**Open questions (resolve during planning):**
-1. Daftar aset audio CC0 yang dipakai.
-2. Sumber daftar kata kasar Indonesia dan Inggris.
-3. Font preview (Lilita One, Rubik) dimuat dari Google Fonts; untuk game harus di-host sendiri (lisensi OFL).
-
 ## Fase 6 — Rilis
 
 **Status:** `OPEN`
