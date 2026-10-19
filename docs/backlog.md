@@ -1,0 +1,89 @@
+# Backlog
+
+This document lists all **unimplemented ideas, features, enhancements, and blocked items** for the project.
+
+Before starting any item here, it **MUST** be converted into a detailed implementation plan in `docs/planning/` first!
+
+---
+
+## Format
+
+Each backlog item follows this format:
+
+```markdown
+## [Feature/Idea Title]
+
+**Status:** `OPEN` | `BLOCKED` *(blocker reason)*
+
+**Summary:** 2-4 sentences describing what is wanted.
+
+**Open questions (resolve during planning):**
+1. [Question 1]
+2. [Question 2]
+3. [Question 3]
+```
+
+---
+
+<!-- ADD BACKLOG ITEMS BELOW -->
+
+## Fase 1 — Fondasi
+
+**Status:** `OPEN`
+
+**Summary:** Monorepo pnpm (`apps/client`, `apps/worker`, `packages/shared`), `wrangler.jsonc`, GitHub Actions (preview tiap PR, produksi tiap merge ke `main`), pindah DNS `radlabs.my.id` ke Cloudflare, dan Custom Domain. Syarat lolos: merge ke `main` otomatis mendeploy halaman kosong ke `cerdas-amat.radlabs.my.id`.
+
+**Open questions (resolve during planning):**
+1. Apakah binding Rate Limiting tersedia di plan gratis? Jika tidak, pakai Durable Object pembatas.
+2. Angka kuota Durable Objects plan gratis di dasbor masih sesuai PRD?
+3. Versi pasti Node/pnpm/Wrangler yang dikunci?
+
+## Fase 2 — Server room
+
+**Status:** `OPEN`
+
+**Summary:** Durable Object `Room`, `POST /api/rooms`, protokol lobby, token kursi, pergantian host, kursi lobby 60 detik, penghapusan room kosong, dan tes Durable Object. Syarat lolos: dua tab browser masuk lobby yang sama dan saling melihat nama serta karakter.
+
+**Open questions (resolve during planning):**
+1. Bentuk persis snapshot pesan `room`.
+2. Strategi tes alarm di `@cloudflare/vitest-pool-workers`.
+
+## Fase 3 — Gameplay tanpa 3D
+
+**Status:** `OPEN`
+
+**Summary:** Hitung mundur, deck, keypad, timer, KO, hasil, jeda dan WO, kembali ke room; tali sementara digambar dengan garis 2D. Syarat lolos: tes Playwright memainkan pertandingan penuh sampai KO dan sampai waktu habis.
+
+**Open questions (resolve during planning):**
+1. Cara mempercepat waktu di tes Playwright (durasi 30 detik penuh atau injeksi jam).
+
+## Fase 4 — Visual
+
+**Status:** `OPEN`
+
+**Summary:** Memindahkan 5 karakter voxel dari preview yang disetujui, arena 3D, layar pilih karakter, pose Menang, Kalah, dan Diam (seri) di layar hasil. Syarat lolos: arena minimal 30 fps di HP Android kelas bawah.
+
+**Open questions (resolve during planning):**
+1. Perangkat Android kelas bawah acuan untuk uji fps.
+2. Preview ([karakter-tarik-tambang.html](initiate-file/karakter-tarik-tambang.html)) memakai Three.js r128. Three.js versi baru mengubah satuan intensitas cahaya (r155) dan color management sRGB (r152), jadi warna dan pencahayaan perlu dikalibrasi ulang agar sama dengan preview.
+3. Preview membuat 3 konteks WebGL (thumbnail, preview, arena); versi game wajib memakai satu `WebGLRenderer` bersama.
+
+## Fase 5 — Pelengkap
+
+**Status:** `OPEN`
+
+**Summary:** Audio (2 musik, 8 efek suara), PWA, filter nama, batas penyalahgunaan, pesan kuota habis, dan tombol Bagikan. Syarat lolos: semua kriteria penerimaan PRD tercentang.
+
+**Open questions (resolve during planning):**
+1. Daftar aset audio CC0 yang dipakai.
+2. Sumber daftar kata kasar Indonesia dan Inggris.
+3. Font preview (Lilita One, Rubik) dimuat dari Google Fonts; untuk game harus di-host sendiri (lisensi OFL).
+
+## Fase 6 — Rilis
+
+**Status:** `OPEN`
+
+**Summary:** Uji di perangkat nyata (Android Chrome, iPhone Safari, pasang PWA), rilis publik, dan pantau pemakaian kuota setiap hari di minggu pertama.
+
+**Open questions (resolve during planning):**
+1. Kriteria kapan perlu upgrade ke Workers Paid.
