@@ -27,17 +27,6 @@ Each backlog item follows this format:
 
 <!-- ADD BACKLOG ITEMS BELOW -->
 
-## Fase 1 — Fondasi
-
-**Status:** `OPEN`
-
-**Summary:** Monorepo pnpm (`apps/client`, `apps/worker`, `packages/shared`), `wrangler.jsonc`, GitHub Actions (preview tiap PR, produksi tiap merge ke `main`), pindah DNS `radlabs.my.id` ke Cloudflare, dan Custom Domain. Syarat lolos: merge ke `main` otomatis mendeploy halaman kosong ke `cerdas-amat.radlabs.my.id`.
-
-**Open questions (resolve during planning):**
-1. Apakah binding Rate Limiting tersedia di plan gratis? Jika tidak, pakai Durable Object pembatas.
-2. Angka kuota Durable Objects plan gratis di dasbor masih sesuai PRD?
-3. Versi pasti Node/pnpm/Wrangler yang dikunci?
-
 ## Fase 2 — Server room
 
 **Status:** `OPEN`
@@ -46,7 +35,7 @@ Each backlog item follows this format:
 
 **Open questions (resolve during planning):**
 1. Bentuk persis snapshot pesan `room`.
-2. Strategi tes alarm di `@cloudflare/vitest-pool-workers`.
+2. Strategi tes alarm di `@cloudflare/vitest-plugin`.
 
 ## Fase 3 — Gameplay tanpa 3D
 

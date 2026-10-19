@@ -82,7 +82,7 @@ Klik di HP hanya menjadi pesan; keputusan skor, tali, dan waktu diambil di Durab
 | Realtime | WebSocket Hibernation API | Room yang diam tidak dihitung durasinya |
 | Validasi pesan | Valibot | Skema dipakai bersama client dan server, ukurannya kecil |
 | PWA | vite-plugin-pwa | Manifest dan service worker dibuat dari konfigurasi build |
-| Tes | Vitest, `@cloudflare/vitest-pool-workers`, Playwright | Unit, Durable Object, dan end-to-end |
+| Tes | Vitest, `@cloudflare/vitest-plugin`, Playwright | Unit, Durable Object, dan end-to-end |
 | Monorepo | pnpm workspaces | Tipe dan aturan main dibagi tanpa menerbitkan paket |
 
 ```text
@@ -359,7 +359,7 @@ Aturan main diuji di tiga lapis: fungsi murni, Durable Object, dan dua browser s
 | Lapis | Alat | Yang diuji |
 | --- | --- | --- |
 | Unit | Vitest | `makeDeck` (10.000 kali acak: tanpa soal berulang, tanpa pasangan tukar berurutan, sambungan deck aman), tabel hasil KO/waktu/seri, filter nama, pembuat kode room |
-| Durable Object | Vitest + `@cloudflare/vitest-pool-workers` | Buat/join/penuh, pergantian host, kursi lobby 60 detik, jeda dan lanjut, WO, batas 3 jeda, hasil batal, dua jawaban bersamaan di selisih 4, akhir waktu |
+| Durable Object | Vitest + `@cloudflare/vitest-plugin` | Buat/join/penuh, pergantian host, kursi lobby 60 detik, jeda dan lanjut, WO, batas 3 jeda, hasil batal, dua jawaban bersamaan di selisih 4, akhir waktu |
 | End-to-end | Playwright, 2 konteks browser | Pertandingan penuh sampai KO, waktu habis dan seri, putus koneksi di tengah permainan, join lewat link |
 | Perangkat | Manual | Android kelas bawah (Chrome), iPhone (Safari) dengan pindah ke WhatsApp saat lobby, pasang PWA |
 

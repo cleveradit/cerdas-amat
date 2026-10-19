@@ -1,0 +1,21 @@
+{
+  "name": "@cerdas-amat/worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --port 8787",
+    "build": "wrangler deploy --dry-run --outdir dist --env=\"\"",
+    "deploy": "wrangler deploy --env=\"\"",
+    "test": "vitest run",
+    "typecheck": "tsc -p .",
+    "types": "wrangler types src/env.d.ts"
+  },
+  "dependencies": {
+    "@cerdas-amat/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.4.4",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.151.1"
+  }
+}
