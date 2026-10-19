@@ -51,6 +51,7 @@ Lima karakter voxel dari [preview yang disetujui](../initiate-file/karakter-tari
 - `stage.current` disimpan dengan `$state.raw`. Proxy `$state` biasa menyalin objek `Stage`, sehingga `fps` yang diubah engine tidak pernah terbaca layar.
 - Objek view Three.js juga disimpan dengan `$state.raw`, agar `Scene` dan isinya tidak dibungkus proxy Svelte.
 - Konteks WebGL dibuat sendiri di `loadStage()` lalu diberikan ke `WebGLRenderer`. Three.js menulis error ke console saat gagal membuat konteks, dan konteks uji terpisah akan menambah satu konteks lagi.
+- Hanya konteks WebGL 2 yang dibuat, karena Three.js r163+ tidak lagi mendukung WebGL 1. Perangkat yang hanya punya WebGL 1 memakai tali 2D (`Arena2D`) seperti perangkat tanpa WebGL.
 - Melepas view (`attach` berikutnya atau fungsi lepas) men-dispose geometri dan material scene-nya; view tidak bisa dipasang ulang. Geometri dan material voxel dipakai bersama, sehingga diunggah ulang ke GPU saat dipakai lagi.
 - `Stage3D` memasang canvas setelah frame pertama layar digambar, karena render 3D pertama bisa lama (kompilasi shader).
 - Avatar dirender satu per tugas (`setTimeout`) agar layar yang sedang dibuka, misalnya kembali ke permainan setelah putus, tidak tertahan.

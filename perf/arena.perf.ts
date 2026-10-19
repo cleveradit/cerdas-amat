@@ -17,6 +17,8 @@ test('arena di tengah pertandingan: rata-rata ≥ 30 fps, tidak ada detik < 25 f
   await p2.goto(`/?room=${code}`);
   await p2.getByRole('button', { name: 'Masuk' }).click();
   await host.getByRole('button', { name: 'Mulai' }).click();
+  // Tunggu layar permainan dulu; sebelum itu overlay hitung mundur belum ada dan cek di bawah langsung lolos.
+  await expect(host.getByTestId('game')).toBeVisible();
   await expect(host.getByTestId('countdown')).toBeHidden({ timeout: 5000 });
 
   // Satu jawaban benar agar tali tidak di posisi awal.
