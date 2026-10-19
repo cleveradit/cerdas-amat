@@ -4,6 +4,7 @@
 
   let {
     initialCode = '',
+    joinLockedUntil,
     pending,
     error,
     onCreate,
@@ -11,6 +12,7 @@
     onClose,
   }: {
     initialCode?: string;
+    joinLockedUntil: number;
     pending: boolean;
     error: string | null;
     onCreate: () => void;
@@ -23,6 +25,19 @@
   // svelte-ignore state_referenced_locally
   let code = $state(initialCode);
   let localError = $state<string | null>(null);
+
+  // Setelah terlalu banyak kode salah, input kode dikunci sampai joinLockedUntil.
+  let now = $state(Date.now());
+  const lockSec = $derived(Math.max(0, Math.ceil((joinLockedUntil - now) / 1000)));
+  $effect(() => {
+    if (joinLockedUntil <= Date.now()) return;
+    now = Date.now();
+    const timer = setInterval(() => {
+      now = Date.now();
+      if (now >= joinLockedUntil) clearInterval(timer);
+    }, 1000);
+    return () => clearInterval(timer);
+  });
 
   function submit(e: SubmitEvent) {
     e.preventDefault();
@@ -58,8 +73,12 @@
           autocomplete="off"
           autocapitalize="characters"
           spellcheck="false"
+          disabled={lockSec > 0}
         />
-        <button type="submit" class="primary" disabled={pending}>{id.play.submitJoin}</button>
+        <button type="submit" class="primary" disabled={pending || lockSec > 0}
+          >{id.play.submitJoin}</button
+        >
+        {#if lockSec > 0}<p class="muted" role="status">{id.play.locked(lockSec)}</p>{/if}
       </form>
       <button type="button" disabled={pending} onclick={() => (mode = 'choose')}>
         {id.play.back}

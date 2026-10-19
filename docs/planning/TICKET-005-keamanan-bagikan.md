@@ -119,22 +119,22 @@ Rules:
 
 | Case | Input | Expected Result | Status |
 |---|---|---|---|
-| Normalisasi (unit) | `normalizeForFilter('B4.ng S4t!')` | `'bangsat'` | `[ ]` |
-| Kata kasar & samaran (unit) | `isBadName` untuk `anjing`, `Bangsat`, `4nj1ng`, `k.o.n.t.o.l`, `fuck`, `SHIT`, `xxbitchxx` | Semua `true` | `[ ]` |
-| False positive (unit, boundary) | `isBadName` untuk `Pantai`, `Santai`, `Kasur`, `Kelas`, `Bass`, `Dickson`, `Grape`, `Budi`, `Siti`, `Asep` | Semua `false` | `[ ]` |
-| Nama acak (unit) | `randomName()` 1000 kali | Tidak ada yang `isBadName` | `[ ]` |
-| Isi daftar (unit) | Setiap entri `BAD_WORDS` | Hanya `a–z`, panjang ≥ 4, tanpa duplikat | `[ ]` |
-| Nama kasar di server (DO, failure) | `hello` dengan nama `Anjing` | Nama di snapshot ≠ `Anjing`, lolos `cleanName`, `isBadName` = `false` | `[ ]` |
-| Batas buat room (DO, boundary) | 21× `POST /api/rooms` dengan `CF-Connecting-IP` yang sama | 20 pertama `200`, ke-21 `429 RATE_LIMITED`; IP lain tetap `200` | `[ ]` |
-| Batas kode salah (DO, boundary) | 31 koneksi ke kode yang belum dibuat, IP sama | 30 pertama close `4404`, ke-31 `error RATE_LIMITED` + close `4429` | `[ ]` |
-| Origin (Worker, failure) | `/ws/:code` tanpa `Origin`, dan dengan `Origin: https://evil.example` | `403 FORBIDDEN_ORIGIN` | `[ ]` |
-| Origin sah (Worker) | `Origin` dengan host sama dengan URL | `101` seperti sebelumnya | `[ ]` |
-| Kuota buat room (Worker, failure) | `env.ROOM` palsu yang stub-nya melempar error | `503 { error: "QUOTA" }` | `[ ]` |
-| Kuota WebSocket (Worker, failure) | Sama, ke `/ws/ABCDE` | `101`, `error QUOTA`, close `4503` | `[ ]` |
-| Pesan kuota (e2e) | `page.route('/api/rooms')` membalas `503 QUOTA`, klik Buat Room | Teks "Server sedang penuh, coba lagi setelah pukul 07.00 WIB" tampil | `[ ]` |
-| Bagikan (e2e) | Chromium tanpa `navigator.share`, izin clipboard, klik Bagikan di lobby | Clipboard berisi `<origin>/?room=KODE`, teks "Link disalin" tampil | `[ ]` |
-| Nama kasar di client (e2e) | Isi nama `Bangsat` di Pilih Karakter | Nama diganti nama acak, pesan penolakan tampil | `[ ]` |
-| Tes lama (e2e) | `pnpm e2e` | Semua tes TICKET-003/004 tetap lulus | `[ ]` |
+| Normalisasi (unit) | `normalizeForFilter('B4.ng S4t!')` | `'bangsat'` | `[x]` |
+| Kata kasar & samaran (unit) | `isBadName` untuk `anjing`, `Bangsat`, `4nj1ng`, `k.o.n.t.o.l`, `fuck`, `SHIT`, `xxbitchxx` | Semua `true` | `[x]` |
+| False positive (unit, boundary) | `isBadName` untuk `Pantai`, `Santai`, `Kasur`, `Kelas`, `Bass`, `Dickson`, `Grape`, `Budi`, `Siti`, `Asep` | Semua `false` | `[x]` |
+| Nama acak (unit) | `randomName()` 1000 kali | Tidak ada yang `isBadName` | `[x]` |
+| Isi daftar (unit) | Setiap entri `BAD_WORDS` | Hanya `a–z`, panjang ≥ 4, tanpa duplikat | `[x]` |
+| Nama kasar di server (DO, failure) | `hello` dengan nama `Anjing` | Nama di snapshot ≠ `Anjing`, lolos `cleanName`, `isBadName` = `false` | `[x]` |
+| Batas buat room (DO, boundary) | 21× `POST /api/rooms` dengan `CF-Connecting-IP` yang sama | 20 pertama `200`, ke-21 `429 RATE_LIMITED`; IP lain tetap `200` | `[x]` |
+| Batas kode salah (DO, boundary) | 31 koneksi ke kode yang belum dibuat, IP sama | 30 pertama close `4404`, ke-31 `error RATE_LIMITED` + close `4429` | `[x]` |
+| Origin (Worker, failure) | `/ws/:code` tanpa `Origin`, dan dengan `Origin: https://evil.example` | `403 FORBIDDEN_ORIGIN` | `[x]` |
+| Origin sah (Worker) | `Origin` dengan host sama dengan URL | `101` seperti sebelumnya | `[x]` |
+| Kuota buat room (Worker, failure) | `env.ROOM` palsu yang stub-nya melempar error | `503 { error: "QUOTA" }` | `[x]` |
+| Kuota WebSocket (Worker, failure) | Sama, ke `/ws/ABCDE` | `101`, `error QUOTA`, close `4503` | `[x]` |
+| Pesan kuota (e2e) | `page.route('/api/rooms')` membalas `503 QUOTA`, klik Buat Room | Teks "Server sedang penuh, coba lagi setelah pukul 07.00 WIB" tampil | `[x]` |
+| Bagikan (e2e) | Chromium tanpa `navigator.share`, izin clipboard, klik Bagikan di lobby | Clipboard berisi `<origin>/?room=KODE`, teks "Link disalin" tampil | `[x]` |
+| Nama kasar di client (e2e) | Isi nama `Bangsat` di Pilih Karakter | Nama diganti nama acak, pesan penolakan tampil | `[x]` |
+| Tes lama (e2e) | `pnpm e2e` | Semua tes TICKET-003/004 tetap lulus | `[x]` |
 
 ---
 
@@ -165,14 +165,21 @@ Expected:
 
 ## 8. Completion Checklist
 
-- [ ] Section 1 fully filled and status set correctly.
-- [ ] All Non-Negotiable Technical Contract items implemented.
-- [ ] Acceptance Test Matrix completed.
-- [ ] Verification commands executed successfully.
-- [ ] No out-of-scope changes introduced.
+- [x] Section 1 fully filled and status set correctly.
+- [x] All Non-Negotiable Technical Contract items implemented.
+- [x] Acceptance Test Matrix completed.
+- [x] Verification commands executed successfully.
+- [x] No out-of-scope changes introduced.
 
 ---
 
 ## 9. Hasil Verifikasi
 
-_Diisi oleh session implementasi, termasuk penyimpangan dari kontrak._
+1. `pnpm lint`, `typecheck`, `test` (shared 28, client 10, worker 49 tes), dan `build` lulus. Bundle awal: JS 77,1 kB (gzip 28,7 kB), CSS 27,1 kB (gzip 8,1 kB).
+2. `pnpm e2e`: 11 tes lulus (8 tes lama + 3 tes baru di `e2e/keamanan.spec.ts`). Cek Origin lolos lewat proxy Vite (host `localhost:5173` sama di `Origin` dan URL request).
+3. Rate limit diuji dengan simulasi binding Rate Limiting di `@cloudflare/vitest-plugin` (Miniflare), termasuk "kode yang benar tidak dihitung".
+4. Tes kuota memanggil handler Worker dengan `env.ROOM` palsu yang stub-nya melempar error (`brokenEnv` di `test/abuse.test.ts`).
+5. Penyesuaian dari kontrak:
+   - `test/helpers.ts`: `createRoom()` dan `connect()` mengirim `CF-Connecting-IP` acak dan `Origin`; `connect()` menerima IP opsional. Tanpa ini tes lama terkena batas 20 room per menit.
+   - `BAD_WORDS` juga diekspor dari `packages/shared/src/index.ts`.
+   - `MenuUtama` hanya menerima `notice` (kontrak no. 8); pesan kuota juga tampil di modal Play lewat `error` yang sudah ada.

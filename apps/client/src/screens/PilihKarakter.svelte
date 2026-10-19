@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CHARACTERS, cleanName, NAME_MAX, randomName } from '@cerdas-amat/shared';
+  import { CHARACTERS, cleanName, isBadName, NAME_MAX, randomName } from '@cerdas-amat/shared';
   import Stage3D from '../components/Stage3D.svelte';
   import { id } from '../i18n/id';
   import { stage } from '../lib/stage.svelte';
@@ -14,6 +14,7 @@
 
   // svelte-ignore state_referenced_locally
   let name = $state(profile.name);
+  let rejected = $state(false);
   let view = $state.raw<ReturnType<typeof createPilihView> | null>(null);
 
   $effect(() => {
@@ -26,7 +27,9 @@
 
   function commitName() {
     const clean = cleanName(name);
-    if (clean) onChange({ ...profile, name: clean });
+    rejected = clean !== null && isBadName(clean);
+    if (rejected) name = randomName();
+    if (clean) onChange({ ...profile, name: rejected ? name : clean });
     else name = profile.name;
   }
 </script>
@@ -55,6 +58,7 @@
       }}>{id.character.random}</button
     >
   </div>
+  {#if rejected}<p class="error" role="alert">{id.character.nameRejected}</p>{/if}
 
   <div class="preview" aria-label={id.character.preview}>
     {#if stage.current && view}

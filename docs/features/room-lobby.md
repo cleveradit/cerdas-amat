@@ -33,6 +33,7 @@ Pemain membuat room lewat `POST /api/rooms`, lalu semua pemain tersambung ke Dur
 | `packages/shared/src/protocol.ts` | Skema Valibot, tipe pesan, close code |
 | `apps/client/src/net/roomClient.ts` | WebSocket client, reconnect, ping |
 | `apps/client/src/App.svelte` | Alur layar dan penanganan pesan |
+| `apps/client/src/lib/share.ts` | Tombol Bagikan: Web Share API, fallback clipboard, lalu link manual |
 
 ## Gotchas
 
@@ -41,7 +42,8 @@ Pemain membuat room lewat `POST /api/rooms`, lalu semua pemain tersambung ke Dur
 - State disimpan setiap perubahan lobby; DO yang hibernasi kehilangan memori, dan state dimuat ulang di constructor lewat `blockConcurrencyWhile`.
 - Tes alarm memundurkan tenggat lewat `runInDurableObject` lalu memanggil `runDurableObjectAlarm`; kode DO selalu membandingkan dengan `Date.now()`.
 - Dua tab di profil browser yang sama berbagi token di localStorage; tab kedua akan mengklaim kursi tab pertama. Untuk tes 2 pemain, pakai jendela incognito.
-- Client berhenti mencoba tersambung ulang hanya pada close code `4400`, `4404`, `4409`, atau setelah `leave`.
+- Client berhenti mencoba tersambung ulang hanya pada close code `4400`, `4404`, `4409`, `4429`, `4503`, atau setelah `leave`.
+- Link Bagikan memakai `location.origin`, jadi di preview link menunjuk ke preview, bukan produksi.
 
 ## Related
 

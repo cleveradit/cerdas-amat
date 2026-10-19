@@ -142,7 +142,7 @@ interface RoomState {
 
 Client dan server bertukar pesan JSON lewat satu WebSocket per pemain; tipe semua pesan ada di `packages/shared` dan divalidasi skema di server. Pesan lebih dari 1 KB atau tidak valid dibalas `error INVALID_MESSAGE`; koneksi ditutup dengan close code `4400` setelah 5 pesan tidak valid.
 
-**Close code aplikasi:** `4400` (pesan tidak valid), `4404` (room tidak ditemukan), `4409` (room penuh). Client berhenti mencoba tersambung ulang saat menerima salah satunya.
+**Close code aplikasi:** `4400` (pesan tidak valid), `4404` (room tidak ditemukan), `4409` (room penuh), `4429` (terlalu banyak kode salah), `4503` (kuota habis). Client berhenti mencoba tersambung ulang saat menerima salah satunya.
 
 **Endpoint HTTP:**
 
@@ -290,12 +290,12 @@ Pembatasan dipasang di dua titik yang rawan disalahgunakan: membuat room dan men
 | Membuat room | 20 per 60 detik per IP | `POST /api/rooms` membalas 429; client menampilkan "Terlalu banyak room dibuat, coba lagi sebentar lagi" |
 | Join dengan kode salah | 30 per 60 detik per IP | `RATE_LIMITED`; input kode dikunci 60 detik |
 
-Batasnya sengaja longgar karena satu sekolah atau satu jaringan seluler sering berbagi satu IP; dengan 28,6 juta kombinasi, 30 tebakan per menit tidak berarti apa-apa bagi penebak. Batas dihitung dengan binding Rate Limiting di Worker ([dokumentasi](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)), yang hanya mendukung periode 10 atau 60 detik dan dihitung per lokasi Cloudflare. Ketersediaannya di plan gratis dicek di Fase 0; kalau tidak tersedia, penghitung disimpan di memori Durable Object khusus pembatas.
+Batasnya sengaja longgar karena satu sekolah atau satu jaringan seluler sering berbagi satu IP; dengan 28,6 juta kombinasi, 30 tebakan per menit tidak berarti apa-apa bagi penebak. Batas dihitung dengan binding Rate Limiting ([dokumentasi](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)) dengan kunci IP `CF-Connecting-IP`; binding ini hanya mendukung periode 10 atau 60 detik dan dihitung per lokasi Cloudflare. Batas buat room dicek di Worker. Batas kode salah dicek di Durable Object room yang belum di-`init()`, karena hanya Durable Object yang tahu kode itu salah; yang ke-31 dibalas `error RATE_LIMITED` dan close `4429`, sebagai ganti `ROOM_NOT_FOUND`.
 
 **Validasi dan identitas:**
 
 - Setiap pesan divalidasi skema di server; fase dan kursi pengirim dicek untuk setiap aksi (misalnya `start` dan `setDuration` hanya dari kursi 0).
-- Upgrade WebSocket hanya diterima dari Origin `https://cerdas-amat.radlabs.my.id` (dan origin preview).
+- Upgrade WebSocket hanya diterima jika header `Origin` ada dan host-nya sama dengan host request (mencakup produksi, preview, dan dev lokal lewat proxy Vite); selain itu 403 tanpa membangunkan Durable Object.
 - Token kursi tidak pernah ikut dalam snapshot `room` yang dikirim ke pemain lain.
 
 **Filter nama:** nama dinormalisasi (huruf kecil, `4→a`, `1→i`, `0→o`, `3→e`, `5→s`, spasi dan tanda baca dibuang), lalu dicocokkan dengan daftar kata kasar Indonesia dan Inggris sebagai potongan kata. Nama yang tertolak diganti nama acak. Filter jalan di client untuk umpan balik cepat dan di server sebagai penentu.
@@ -322,7 +322,7 @@ Angka harian dibagi dari kuota bulanan Durable Objects plan gratis (sekitar 3 ju
 - Ping dijawab `setWebSocketAutoResponse` tanpa membangunkan Durable Object.
 - Tulisan ke storage dibatasi 1 per detik selama bermain.
 
-**Saat kuota habis:** Worker menangkap error dari Durable Object dan membalas 503 dengan kode `QUOTA`. Client menampilkan "Server sedang penuh, coba lagi setelah pukul 07.00 WIB". Kalau pemakaian rutin mendekati batas, jalan keluarnya Workers Paid seharga 5 dolar AS per bulan.
+**Saat kuota habis:** Worker menangkap error dari Durable Object dan membalas 503 dengan kode `QUOTA`; untuk `/ws/:code`, Worker menerima WebSocket sendiri lalu mengirim `error QUOTA` dan close `4503`. Kalau kuota request Worker yang habis, Worker tidak dijalankan: client menganggap kuota habis jika `POST /api/rooms` tidak membalas JSON, atau jika WebSocket gagal terbuka dan `GET /api/health` tidak membalas 200. Client menampilkan "Server sedang penuh, coba lagi setelah pukul 07.00 WIB". Kalau pemakaian rutin mendekati batas, jalan keluarnya Workers Paid seharga 5 dolar AS per bulan.
 
 ## Deploy, domain, dan CI/CD
 

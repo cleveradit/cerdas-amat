@@ -1,4 +1,4 @@
-import { CHARACTERS, cleanName, randomName, type Character } from '@cerdas-amat/shared';
+import { CHARACTERS, cleanName, isBadName, randomName, type Character } from '@cerdas-amat/shared';
 
 export interface Profile {
   name: string;
@@ -31,7 +31,7 @@ export function loadProfile(): Profile {
     const p = JSON.parse(read(PROFILE_KEY) ?? 'null') as Partial<Profile> | null;
     const name = p?.name ? cleanName(p.name) : null;
     const character = CHARACTERS.find((c) => c === p?.character);
-    if (name && character) return { name, character };
+    if (name && character) return { name: isBadName(name) ? randomName() : name, character };
   } catch {
     // Data rusak: buat profil baru.
   }

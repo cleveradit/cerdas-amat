@@ -10,15 +10,22 @@ export interface TestSocket {
   closed: Promise<number>;
 }
 
+/** IP acak per panggilan, supaya batas rate limit per IP tidak terbawa antar tes. */
+export const randomIp = () =>
+  `10.${[0, 0, 0].map(() => Math.floor(Math.random() * 256)).join('.')}`;
+
 export async function createRoom(): Promise<string> {
-  const res = await exports.default.fetch('https://example.com/api/rooms', { method: 'POST' });
+  const res = await exports.default.fetch('https://example.com/api/rooms', {
+    method: 'POST',
+    headers: { 'CF-Connecting-IP': randomIp() },
+  });
   const body = (await res.json()) as { code: string };
   return body.code;
 }
 
-export async function connect(code: string): Promise<TestSocket> {
+export async function connect(code: string, ip = randomIp()): Promise<TestSocket> {
   const res = await exports.default.fetch(`https://example.com/ws/${code}`, {
-    headers: { Upgrade: 'websocket' },
+    headers: { Upgrade: 'websocket', Origin: 'https://example.com', 'CF-Connecting-IP': ip },
   });
   const ws = res.webSocket;
   if (!ws) throw new Error(`upgrade gagal: ${res.status}`);

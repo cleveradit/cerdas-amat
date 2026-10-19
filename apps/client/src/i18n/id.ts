@@ -17,11 +17,13 @@ export const id = {
     close: 'Tutup',
     back: 'Kembali',
     connecting: 'Menghubungkan...',
+    locked: (sec: number) => `Coba lagi dalam ${sec} detik`,
   },
   character: {
     title: 'Pilih Karakter',
     nameLabel: 'Nama',
     random: 'Acak',
+    nameRejected: 'Nama itu tidak boleh dipakai, diganti nama acak',
     preview: 'Preview karakter',
     back: '‹ Kembali',
     names: {
@@ -34,6 +36,11 @@ export const id = {
   },
   lobby: {
     code: 'Kode room',
+    share: 'Bagikan',
+    shareText: (code: string) =>
+      `Ayo adu perkalian di Tarik Tambang Matematika! Kode room: ${code}`,
+    copied: 'Link disalin',
+    copyManual: 'Salin link ini:',
     host: 'Host',
     player2: 'Player 2',
     you: '(kamu)',
@@ -83,6 +90,9 @@ export const id = {
     ROOM_FULL: 'Room sudah penuh',
     NOT_HOST: 'Hanya host yang boleh melakukan ini',
     INVALID_MESSAGE: 'Terjadi kesalahan, coba lagi',
+    RATE_LIMITED: 'Terlalu banyak kode salah',
+    QUOTA: 'Server sedang penuh, coba lagi setelah pukul 07.00 WIB',
     createFailed: 'Gagal membuat room, coba lagi',
+    createLimited: 'Terlalu banyak room dibuat, coba lagi sebentar lagi',
   },
 } as const;
