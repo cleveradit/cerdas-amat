@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     CLOSE_ROOM_NOT_FOUND,
+    type Character,
     normalizeRoomCode,
     type Duration,
     type Question,
@@ -8,8 +9,9 @@
     type RoomSnapshot,
     type SeatIndex,
   } from '@cerdas-amat/shared';
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { id } from './i18n/id';
+  import { initStage } from './lib/stage.svelte';
   import { clearToken, loadProfile, loadToken, saveProfile, saveToken } from './lib/storage';
   import { RoomClient, type ConnectionStatus } from './net/roomClient';
   import Hasil from './screens/Hasil.svelte';
@@ -24,6 +26,7 @@
     result: Result;
     score: [number, number];
     names: [string, string];
+    characters: [Character, Character];
     seat: SeatIndex;
   }
 
@@ -53,6 +56,7 @@
 
   const client = new RoomClient();
   onDestroy(() => client.destroy());
+  onMount(initStage);
 
   client.onOpen = () => {
     client.send({
@@ -146,6 +150,7 @@
       result: r.result!,
       score: [r.score[0], r.score[1]],
       names: [r.seats[0]?.name ?? '', r.seats[1]?.name ?? ''],
+      characters: [r.seats[0]?.character ?? 'kucing', r.seats[1]?.character ?? 'kucing'],
       seat,
     };
   }
@@ -237,6 +242,7 @@
       result={shownResult.result}
       score={shownResult.score}
       names={shownResult.names}
+      characters={shownResult.characters}
       mySeat={shownResult.seat}
       onBack={backToRoom}
       onLeave={leave}
@@ -275,69 +281,8 @@
     min-height: 100dvh;
     max-width: 420px;
     margin: 0 auto;
-    padding: 16px;
-    font-family: system-ui, sans-serif;
-  }
-  :global(.screen) {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  :global(.slots) {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  :global(.slot) {
-    border: 2px solid #ccd;
-    border-radius: 12px;
-    padding: 8px;
-  }
-  :global(.slot.me) {
-    border-color: #2f6fd0;
-  }
-  :global(.slot p) {
-    margin: 2px 0;
-  }
-  :global(.muted) {
-    color: #667;
-  }
-  :global(.error) {
-    color: #c22;
-  }
-  :global(.code) {
-    font-size: 1.5em;
-    letter-spacing: 0.1em;
-  }
-  :global(.backdrop) {
-    position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    background: rgb(0 0 0 / 0.4);
-    padding: 16px;
-  }
-  :global(.modal) {
-    background: #fff;
-    border-radius: 16px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: min(100%, 360px);
-  }
-  :global(.modal form),
-  :global(.row) {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  :global(.avatars) {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
-  }
-  :global(button[aria-pressed='true']) {
-    outline: 3px solid #2f6fd0;
+    padding-block: 16px 24px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
   }
 </style>

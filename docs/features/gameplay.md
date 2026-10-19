@@ -29,7 +29,7 @@ Host menekan Mulai, server memasang hitung mundur 3 detik dan mengirim deck 162 
 | `packages/shared/src/deck.ts` | `makeDeck(prev)` |
 | `packages/shared/src/result.ts` | `koWinner`, `timeWinner`, konstanta waktu |
 | `apps/worker/src/room.ts` | Fase, jawaban, jeda, heartbeat, satu alarm |
-| `apps/client/src/screens/Permainan.svelte` | HUD, tali 2D, soal, keypad, overlay |
+| `apps/client/src/screens/Permainan.svelte` | HUD, arena (3D, atau tali 2D tanpa WebGL), soal, keypad, overlay |
 | `apps/client/src/screens/Hasil.svelte` | Teks hasil dari sudut pandang pemain |
 | `apps/client/src/game/clock.ts` | Selisih jam dengan server dari pesan `sync` |
 | `e2e/match.spec.ts` | Tes Playwright 2 pemain |

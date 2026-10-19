@@ -1,0 +1,61 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`jumlah voxel per bagian: beruang 1`] = `
+{
+  "armL": 20,
+  "armR": 20,
+  "body": 210,
+  "head": 459,
+  "legL": 36,
+  "legR": 36,
+  "tail": 6,
+}
+`;
+
+exports[`jumlah voxel per bagian: katak 1`] = `
+{
+  "armL": 20,
+  "armR": 20,
+  "body": 210,
+  "head": 466,
+  "legL": 43,
+  "legR": 43,
+  "tail": 0,
+}
+`;
+
+exports[`jumlah voxel per bagian: kucing 1`] = `
+{
+  "armL": 20,
+  "armR": 20,
+  "body": 210,
+  "head": 454,
+  "legL": 36,
+  "legR": 36,
+  "tail": 7,
+}
+`;
+
+exports[`jumlah voxel per bagian: panda 1`] = `
+{
+  "armL": 20,
+  "armR": 20,
+  "body": 210,
+  "head": 450,
+  "legL": 36,
+  "legR": 36,
+  "tail": 6,
+}
+`;
+
+exports[`jumlah voxel per bagian: rubah 1`] = `
+{
+  "armL": 20,
+  "armR": 20,
+  "body": 210,
+  "head": 464,
+  "legL": 36,
+  "legR": 36,
+  "tail": 60,
+}
+`;

@@ -76,6 +76,7 @@ Prasyarat:
 | `pnpm lint` / `pnpm format` | ESLint + cek Prettier / tulis format Prettier |
 | `pnpm build` | Build client ke `apps/client/dist`, lalu `wrangler deploy --dry-run` untuk validasi Worker |
 | `pnpm e2e` | Playwright 2 pemain (Chromium) terhadap `pnpm dev`; pertama kali jalankan `pnpm exec playwright install chromium`. Sekitar 1,5 menit karena tes waktu habis memakai durasi 30 detik penuh |
+| `pnpm perf` | Playwright: fps arena 10 detik di tengah pertandingan (360×740, DPR 2, CPU 6×); lolos jika rata-rata ≥ 30 fps dan tidak ada detik < 25 fps. Hanya lokal, tidak di CI |
 | `pnpm --filter @cerdas-amat/worker types` | Regenerasi `apps/worker/src/env.d.ts` setelah mengubah `wrangler.jsonc` |
 
 Catatan:

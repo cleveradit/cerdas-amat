@@ -8,6 +8,7 @@ export const id = {
     character: 'Pilih Karakter',
   },
   play: {
+    title: 'Play',
     create: 'Buat Room',
     join: 'Join Room',
     codeLabel: 'Kode room',
@@ -21,6 +22,7 @@ export const id = {
     title: 'Pilih Karakter',
     nameLabel: 'Nama',
     random: 'Acak',
+    preview: 'Preview karakter',
     back: '‹ Kembali',
     names: {
       kucing: 'Kucing',
@@ -55,6 +57,8 @@ export const id = {
     leave: 'Keluar',
     confirmLeave: 'Keluar sekarang berarti menyerah. Yakin?',
     diff: (d: number) => `Selisih ${d} · KO di 5`,
+    noWebgl: 'Browser ini tidak bisa menampilkan 3D. Permainan tetap berjalan.',
+    fps: (n: number) => `${n} fps`,
     waitingFor: (name: string, sec: number) => `Menunggu ${name} tersambung... ${sec}`,
     reconnecting: 'Menyambung ulang...',
   },
