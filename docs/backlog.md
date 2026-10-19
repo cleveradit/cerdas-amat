@@ -27,16 +27,6 @@ Each backlog item follows this format:
 
 <!-- ADD BACKLOG ITEMS BELOW -->
 
-## Fase 2 — Server room
-
-**Status:** `OPEN`
-
-**Summary:** Durable Object `Room`, `POST /api/rooms`, protokol lobby, token kursi, pergantian host, kursi lobby 60 detik, penghapusan room kosong, dan tes Durable Object. Syarat lolos: dua tab browser masuk lobby yang sama dan saling melihat nama serta karakter.
-
-**Open questions (resolve during planning):**
-1. Bentuk persis snapshot pesan `room`.
-2. Strategi tes alarm di `@cloudflare/vitest-plugin`.
-
 ## Fase 3 — Gameplay tanpa 3D
 
 **Status:** `OPEN`
@@ -76,3 +66,4 @@ Each backlog item follows this format:
 
 **Open questions (resolve during planning):**
 1. Kriteria kapan perlu upgrade ke Workers Paid.
+2. Angka kuota Durable Objects plan gratis di dasbor masih sesuai tabel kuota PRD? (dicek user di dasbor Cloudflare)

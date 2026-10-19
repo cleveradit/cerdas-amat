@@ -1,7 +1,7 @@
 # Implementation Plan: TICKET-001 (Fondasi monorepo, Worker, dan CI/CD)
 
 **Ticket:** `TICKET-001`  
-**Status:** `READY`  
+**Status:** `DONE`  
 **Target Audience:** AI Developer Agents  
 **Depends On:** `None`
 
@@ -103,7 +103,7 @@ Rules:
 ### F. Verifikasi plan gratis
 
 1. Deploy pertama memastikan Durable Object SQLite dan binding Rate Limiting diterima.
-2. Catat angka kuota Durable Objects dari dasbor; perbarui tabel kuota di PRD jika berbeda.
+2. Catat angka kuota Durable Objects dari dasbor; perbarui tabel kuota di PRD jika berbeda. **Belum dikerjakan:** butuh akses dasbor oleh user; dipindah ke backlog Fase 6.
 
 ---
 
@@ -116,9 +116,9 @@ Rules:
 | SPA fallback (boundary) | `GET /lobby/apa-saja` | `200`, isi `index.html` client, bukan 404 Worker | `[x]` |
 | Alfabet kode room | `ROOM_CODE_ALPHABET` | 31 karakter unik, tanpa `0`, `O`, `1`, `I`, `L` | `[x]` |
 | Dev lokal | `pnpm dev`, buka `http://localhost:5173`, lalu `/api/health` lewat proxy | Halaman judul tampil; health `200` | `[x]` |
-| PR preview | Buka PR ke `main` | CI hijau; `https://cerdas-amat-preview.<akun>.workers.dev/api/health` → `200` | `[ ]` |
-| CI gagal (failure) | PR dengan error lint atau tes gagal | Workflow merah, langkah deploy tidak berjalan | `[ ]` |
-| Produksi | Merge ke `main` | `https://cerdas-amat.radlabs.my.id` menampilkan halaman judul dengan HTTPS valid | `[ ]` |
+| PR preview | Buka PR ke `main` | CI hijau; `https://cerdas-amat-preview.<akun>.workers.dev/api/health` → `200` | `[x]` |
+| CI gagal (failure) | PR dengan error lint atau tes gagal | Workflow merah, langkah deploy tidak berjalan | `[x]` |
+| Produksi | Merge ke `main` | `https://cerdas-amat.radlabs.my.id` menampilkan halaman judul dengan HTTPS valid | `[x]` |
 
 ---
 
@@ -148,8 +148,17 @@ Expected:
 
 ## 8. Completion Checklist
 
-- [ ] Section 1 fully filled and status set correctly.
-- [ ] All Non-Negotiable Technical Contract items implemented.
-- [ ] Acceptance Test Matrix completed.
-- [ ] Verification commands executed successfully.
-- [ ] No out-of-scope changes introduced.
+- [x] Section 1 fully filled and status set correctly.
+- [x] All Non-Negotiable Technical Contract items implemented.
+- [x] Acceptance Test Matrix completed.
+- [x] Verification commands executed successfully.
+- [x] No out-of-scope changes introduced.
+
+---
+
+## 9. Hasil Verifikasi
+
+1. Lokal: `pnpm lint`, `typecheck`, `test`, `build` lulus; `pnpm dev` melayani halaman dan proxy `/api`.
+2. PR #1: CI hijau; preview `https://cerdas-amat-preview.radityodwiki.workers.dev/api/health` → `{"ok":true}`. Durable Object SQLite dan binding Rate Limiting diterima di plan gratis.
+3. PR #2 (percobaan, ditutup): lint gagal → typecheck, test, build, dan deploy dilewati.
+4. Merge ke `main`: workflow Deploy sukses; `https://cerdas-amat.radlabs.my.id` menampilkan halaman judul dengan HTTPS valid, `/api/health` → `200`, path SPA → `200`.

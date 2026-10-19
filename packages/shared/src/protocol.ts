@@ -1,0 +1,49 @@
+import * as v from 'valibot';
+import { NAME_MAX } from './names';
+import { CHARACTERS, DURATIONS, type RoomSnapshot, type SeatIndex } from './room';
+
+export const MAX_MESSAGE_BYTES = 1024;
+export const MAX_INVALID_MESSAGES = 5;
+
+/** Kode close WebSocket aplikasi; client berhenti mencoba ulang saat menerimanya. */
+export const CLOSE_INVALID = 4400;
+export const CLOSE_ROOM_NOT_FOUND = 4404;
+export const CLOSE_ROOM_FULL = 4409;
+
+const NameSchema = v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(NAME_MAX));
+const CharacterSchema = v.picklist(CHARACTERS);
+
+export const ClientMessageSchema = v.variant('type', [
+  v.object({
+    type: v.literal('hello'),
+    token: v.optional(v.pipe(v.string(), v.uuid())),
+    name: NameSchema,
+    character: CharacterSchema,
+  }),
+  v.object({ type: v.literal('setProfile'), name: NameSchema, character: CharacterSchema }),
+  v.object({ type: v.literal('setDuration'), sec: v.picklist(DURATIONS) }),
+  v.object({ type: v.literal('leave') }),
+]);
+
+export type ClientMessage = v.InferOutput<typeof ClientMessageSchema>;
+
+export type ErrorCode = 'ROOM_NOT_FOUND' | 'ROOM_FULL' | 'NOT_HOST' | 'INVALID_MESSAGE';
+
+export type ServerMessage =
+  | { type: 'welcome'; seat: SeatIndex; token: string; room: RoomSnapshot; serverNow: number }
+  // `seat` = kursi penerima saat ini; berubah saat host keluar dan Player 2 menjadi host.
+  | { type: 'room'; room: RoomSnapshot; seat: SeatIndex }
+  | { type: 'error'; code: ErrorCode; message: string };
+
+/** `null` jika lebih dari MAX_MESSAGE_BYTES, bukan JSON, atau tidak lolos skema. */
+export function parseClientMessage(raw: string): ClientMessage | null {
+  if (new TextEncoder().encode(raw).length > MAX_MESSAGE_BYTES) return null;
+  let data: unknown;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  const result = v.safeParse(ClientMessageSchema, data);
+  return result.success ? result.output : null;
+}
