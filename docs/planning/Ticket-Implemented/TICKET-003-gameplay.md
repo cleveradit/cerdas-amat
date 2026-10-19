@@ -1,7 +1,7 @@
 # Implementation Plan: TICKET-003 (Gameplay tanpa 3D)
 
 **Ticket:** `TICKET-003`  
-**Status:** `READY`  
+**Status:** `DONE`  
 **Target Audience:** AI Developer Agents  
 **Depends On:** `TICKET-002` (DONE)
 
@@ -161,11 +161,11 @@ Expected:
 
 ## 8. Completion Checklist
 
-- [ ] Section 1 fully filled and status set correctly.
-- [ ] All Non-Negotiable Technical Contract items implemented.
-- [ ] Acceptance Test Matrix completed.
-- [ ] Verification commands executed successfully.
-- [ ] No out-of-scope changes introduced.
+- [x] Section 1 fully filled and status set correctly.
+- [x] All Non-Negotiable Technical Contract items implemented.
+- [x] Acceptance Test Matrix completed.
+- [x] Verification commands executed successfully.
+- [x] No out-of-scope changes introduced.
 
 ---
 
@@ -174,4 +174,5 @@ Expected:
 1. `pnpm lint`, `typecheck`, `test` (shared 23, worker 39 tes; worker dijalankan 3× tanpa flaky), dan `build` lulus.
 2. `pnpm e2e`: 4 tes Playwright (KO dengan tali sama di kedua layar, jawaban salah, waktu habis menang 2:1 → kembali ke room → seri, putus sebentar lalu lanjut → putus > 10 detik WO) lulus 2× berturut-turut, sekitar 1,3 menit.
 3. Penyesuaian dari kontrak: pemain yang tersambung ulang saat `paused` tidak menerima `pause`/`resume` sendiri; state-nya dibaca dari snapshot `welcome` (urutan pesan: `welcome` selalu pertama). Tes e2e putus koneksi memakai tutup-buka tab, bukan mode offline.
-4. Belum: CI di PR dan satu pertandingan manual di produksi setelah merge.
+4. PR #4: CI hijau, termasuk `pnpm e2e` dan smoke test preview.
+5. Merge ke `main`: workflow Deploy sukses (termasuk `pnpm e2e`); 4 tes Playwright lulus terhadap `https://cerdas-amat.radlabs.my.id`.
