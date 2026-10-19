@@ -15,11 +15,25 @@ export default defineConfig({
     // Pakai GPU jika ada; tanpa GPU (runner CI) Chromium kembali ke WebGL perangkat lunak.
     launchOptions: { args: ['--enable-gpu', '--ignore-gpu-blocklist'] },
   },
-  webServer: {
-    command: 'pnpm dev',
-    // Lewat proxy Vite ke `wrangler dev`, jadi siap hanya jika keduanya hidup.
-    url: 'http://localhost:5173/api/health',
-    reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
-  },
+  projects: [
+    { name: 'dev', testIgnore: 'pwa.spec.ts' },
+    // Manifest dan service worker hanya ada di hasil build.
+    { name: 'pwa', testMatch: 'pwa.spec.ts', use: { baseURL: 'http://localhost:4173' } },
+  ],
+  webServer: [
+    {
+      command: 'pnpm dev',
+      // Lewat proxy Vite ke `wrangler dev`, jadi siap hanya jika keduanya hidup.
+      url: 'http://localhost:5173/api/health',
+      reuseExistingServer: !process.env.CI,
+      timeout: 60_000,
+    },
+    {
+      command:
+        'pnpm --filter @cerdas-amat/client build && pnpm --filter @cerdas-amat/client preview --port 4173 --strictPort',
+      url: 'http://localhost:4173',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+  ],
 });

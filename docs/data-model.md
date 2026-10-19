@@ -10,6 +10,8 @@
 | WebSocket attachment (`serializeAttachment`) | `{ seat: SeatIndex \| null, invalid: number, since: number }` per koneksi | Selama koneksi hidup; tidak memakai kuota tulis storage |
 | localStorage `cerdas-amat:profile` | `{ name, character }` | Permanen di perangkat pemain |
 | localStorage `cerdas-amat:token:<KODE>` | Token kursi untuk room itu | Dihapus saat pemain menekan Keluar atau room tidak ditemukan |
+| localStorage `cerdas-amat:volume` | `{ music, sfx }`, bilangan bulat 0–100 (default 50 dan 80; nilai rusak diganti default) | Permanen di perangkat pemain |
+| Cache service worker (Workbox precache) | Aset hasil build: js, css, html, png, svg, woff2, mp3 | Diganti otomatis saat versi baru di-deploy (`registerType: 'autoUpdate'`) |
 
 Tidak ada database eksternal (keputusan produk no. 5).
 

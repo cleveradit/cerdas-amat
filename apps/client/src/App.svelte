@@ -10,13 +10,30 @@
     type SeatIndex,
   } from '@cerdas-amat/shared';
   import { onDestroy, onMount } from 'svelte';
+  import {
+    playSfx,
+    setMusic,
+    setVolumes,
+    unlockAudio,
+    type Music,
+    type Volumes,
+  } from './audio/audio';
   import { id } from './i18n/id';
   import { initStage } from './lib/stage.svelte';
-  import { clearToken, loadProfile, loadToken, saveProfile, saveToken } from './lib/storage';
+  import {
+    clearToken,
+    loadProfile,
+    loadToken,
+    loadVolumes,
+    saveProfile,
+    saveToken,
+    saveVolumes,
+  } from './lib/storage';
   import { RoomClient, type ConnectionStatus } from './net/roomClient';
   import Hasil from './screens/Hasil.svelte';
   import Lobby from './screens/Lobby.svelte';
   import MenuUtama from './screens/MenuUtama.svelte';
+  import ModalPengaturan from './screens/ModalPengaturan.svelte';
   import ModalPlay from './screens/ModalPlay.svelte';
   import Permainan from './screens/Permainan.svelte';
   import PilihKarakter from './screens/PilihKarakter.svelte';
@@ -34,6 +51,11 @@
   let screen = $state<Screen>('menu');
   let characterBack = $state<'menu' | 'lobby'>('menu');
   let playOpen = $state(false);
+  let settingsOpen = $state(false);
+  const savedVolumes = loadVolumes();
+  setVolumes(savedVolumes);
+  let volumes = $state(savedVolumes);
+  let online = $state(navigator.onLine);
   let pending = $state(false);
   let error = $state<string | null>(null);
   // Pesan kuota habis di Menu Utama; bertahan sampai berhasil masuk room.
@@ -54,12 +76,29 @@
     room !== null && shownResult !== null && (room.phase === 'result' || me?.inLobby === false),
   );
 
+  // Musik menu di menu, pilih karakter, dan lobby; musik game dari hitung mundur; hening di hasil.
+  const music = $derived<Music | null>(
+    screen === 'lobby' && room && inGame ? 'game' : screen === 'lobby' && onResult ? null : 'menu',
+  );
+  $effect(() => setMusic(music));
+
   const linkCode = normalizeRoomCode(new URLSearchParams(location.search).get('room') ?? '');
   let code = '';
 
   const client = new RoomClient();
   onDestroy(() => client.destroy());
   onMount(initStage);
+  // Aturan autoplay: AudioContext hanya boleh dibuat setelah gestur pertama di halaman.
+  onMount(() => {
+    const unlock = () => {
+      unlockAudio();
+      removeEventListener('pointerdown', unlock, true);
+      removeEventListener('keydown', unlock, true);
+    };
+    addEventListener('pointerdown', unlock, true);
+    addEventListener('keydown', unlock, true);
+    return unlock;
+  });
 
   client.onOpen = () => {
     client.send({
@@ -126,6 +165,7 @@
       }
       case 'tug':
         if (room) room.score = msg.score;
+        playSfx('tug');
         break;
       case 'reject':
         myQ = msg.expected;
@@ -249,6 +289,14 @@
     if (room) client.send({ type: 'setProfile', name: next.name, character: next.character });
   }
 
+  function changeVolumes(next: Volumes) {
+    const sfxChanged = next.sfx !== volumes.sfx;
+    volumes = next;
+    setVolumes(next);
+    saveVolumes(next);
+    if (sfxChanged) playSfx('key'); // contoh volume efek suara
+  }
+
   function openCharacter(from: 'menu' | 'lobby') {
     characterBack = from;
     screen = 'karakter';
@@ -261,14 +309,18 @@
   }
 </script>
 
+<svelte:window ononline={() => (online = true)} onoffline={() => (online = false)} />
+
 <main>
   {#if screen === 'menu'}
     <MenuUtama
-      {notice}
+      notice={online ? notice : id.menu.offline}
+      offline={!online}
       onPlay={() => {
         error = null;
         playOpen = true;
       }}
+      onSettings={() => (settingsOpen = true)}
       onCharacter={() => openCharacter('menu')}
     />
   {:else if screen === 'karakter'}
@@ -316,6 +368,10 @@
         playOpen = false;
       }}
     />
+  {/if}
+
+  {#if settingsOpen && screen === 'menu'}
+    <ModalPengaturan {volumes} onChange={changeVolumes} onClose={() => (settingsOpen = false)} />
   {/if}
 </main>
 

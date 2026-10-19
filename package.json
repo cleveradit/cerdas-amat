@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "typecheck": "tsc -p . && pnpm -r typecheck",
     "e2e": "playwright test",
-    "perf": "playwright test -c playwright.perf.config.ts"
+    "perf": "playwright test -c playwright.perf.config.ts",
+    "pwa-icons": "node scripts/pwa-icons.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

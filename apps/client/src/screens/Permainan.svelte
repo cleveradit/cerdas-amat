@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Question, RoomSnapshot, SeatIndex } from '@cerdas-amat/shared';
   import { onDestroy } from 'svelte';
+  import { playSfx } from '../audio/audio';
   import Arena2D from '../components/Arena2D.svelte';
   import Stage3D from '../components/Stage3D.svelte';
   import { serverNow } from '../game/clock';
@@ -101,6 +102,11 @@
     shakes++;
   }
 
+  // Bunyi tiap angka hitung mundur 3-2-1.
+  $effect(() => {
+    if (countdown !== null) playSfx('countdown');
+  });
+
   // Soal baru (benar, atau dikembalikan server lewat `reject`) mengosongkan kolom.
   $effect(() => {
     void question;
@@ -110,6 +116,7 @@
   function press(key: string) {
     if (!canAnswer) return;
     wrong = false;
+    if (key !== 'enter') playSfx('key'); // Enter berbunyi benar/salah
     if (/^\d$/.test(key)) {
       if (input.length < 2) input += key;
     } else if (key === 'del') {
@@ -120,9 +127,11 @@
       const value = Number(input);
       input = '';
       if (value === question![0] * question![1]) {
+        playSfx('correct');
         onCorrect(value);
         flashOk();
       } else {
+        playSfx('wrong');
         wrong = true;
         shake();
       }
