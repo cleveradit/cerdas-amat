@@ -6,7 +6,11 @@ Status meanings (`DRAFT` / `REVIEW` / `READY` / `DONE`): see [ai-context.md §5 
 
 ## Execution Order
 
-_No active tickets. Completed tickets are moved to `Ticket-Implemented/`._
+| No | Ticket | Status | Depends On |
+|---|---|---|---|
+| 1 | [TICKET-003 — Gameplay tanpa 3D](TICKET-003-gameplay.md) | `READY` | TICKET-002 (DONE) |
+
+Completed tickets are moved to `Ticket-Implemented/`.
 
 ## Global Agent Rules
 

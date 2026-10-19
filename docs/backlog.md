@@ -27,15 +27,6 @@ Each backlog item follows this format:
 
 <!-- ADD BACKLOG ITEMS BELOW -->
 
-## Fase 3 — Gameplay tanpa 3D
-
-**Status:** `OPEN`
-
-**Summary:** Hitung mundur, deck, keypad, timer, KO, hasil, jeda dan WO, kembali ke room; tali sementara digambar dengan garis 2D. Syarat lolos: tes Playwright memainkan pertandingan penuh sampai KO dan sampai waktu habis.
-
-**Open questions (resolve during planning):**
-1. Cara mempercepat waktu di tes Playwright (durasi 30 detik penuh atau injeksi jam).
-
 ## Fase 4 — Visual
 
 **Status:** `OPEN`

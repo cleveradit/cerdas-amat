@@ -164,8 +164,8 @@ Kedua layar menampilkan arena yang sama dan sinkron: host di kiri, Player 2 di k
 
 Setelah KO, waktu habis, atau WO, tiap layar menampilkan hasil dari sudut pandang pemainnya.
 
-- **Teks utama:** "Kamu Menang", "Kamu Kalah", atau "Seri".
-- **Keterangan:** KO, Waktu habis, atau Menang WO.
+- **Teks utama:** "Kamu Menang", "Kamu Kalah", "Seri", atau "Dibatalkan" (kedua pemain terputus).
+- **Keterangan:** KO, Waktu habis, Menang WO / Kalah WO (putus koneksi), Lawan menyerah / Kamu menyerah (menekan Keluar), atau Kedua pemain terputus.
 - **Skor:** jumlah jawaban benar kedua pemain.
 - **Karakter:** pemenang dengan pose Menang, yang kalah dengan pose Kalah; saat seri keduanya pose Diam.
 - Tombol **Kembali ke room** membawa kedua pemain ke lobby room yang sama.

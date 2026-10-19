@@ -63,3 +63,16 @@ export async function join(code: string, name: string, extra: Record<string, unk
 export function roomStub(code: string) {
   return env.ROOM.get(env.ROOM.idFromName(code));
 }
+
+type Msg<T extends ServerMessage['type']> = Extract<ServerMessage, { type: T }>;
+
+/** Baca pesan sampai menemukan tipe `type` (pesan lain dilewati). */
+export async function until<T extends ServerMessage['type']>(
+  sock: TestSocket,
+  type: T,
+): Promise<Msg<T>> {
+  for (;;) {
+    const msg = await sock.next();
+    if (msg.type === type) return msg as Msg<T>;
+  }
+}

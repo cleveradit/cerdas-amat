@@ -9,6 +9,7 @@
     status,
     error,
     onDuration,
+    onStart,
     onCharacter,
     onLeave,
   }: {
@@ -17,11 +18,13 @@
     status: ConnectionStatus;
     error: string | null;
     onDuration: (sec: Duration) => void;
+    onStart: () => void;
     onCharacter: () => void;
     onLeave: () => void;
   } = $props();
 
   const isHost = $derived(mySeat === 0);
+  const canStart = $derived(room.seats.every((s) => s !== null && s.connected && s.inLobby));
 </script>
 
 <section class="screen">
@@ -39,7 +42,11 @@
             {#if i === mySeat}{id.lobby.you}{/if}
           </p>
           <p>{id.character.names[seat.character]}</p>
-          {#if !seat.connected}<p class="muted">{id.lobby.disconnected}</p>{/if}
+          {#if !seat.inLobby}
+            <p class="muted">{id.lobby.viewingResult}</p>
+          {:else if !seat.connected}
+            <p class="muted">{id.lobby.disconnected}</p>
+          {/if}
         {:else}
           <p class="muted">{id.lobby.waiting}</p>
         {/if}
@@ -63,6 +70,12 @@
   {/if}
 
   {#if error}<p class="error" role="alert">{error}</p>{/if}
+
+  {#if isHost}
+    <button type="button" disabled={!canStart} onclick={onStart}>{id.lobby.start}</button>
+  {:else}
+    <p class="muted">{id.lobby.waitingHost}</p>
+  {/if}
 
   <button type="button" onclick={onCharacter}>{id.lobby.changeCharacter}</button>
   <button type="button" onclick={onLeave}>{id.lobby.leave}</button>
