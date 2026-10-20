@@ -121,6 +121,15 @@ Posisi tali ditentukan oleh selisih jawaban benar kedua pemain. Tiap jawaban ben
 | AC | Mengosongkan seluruh jawaban |
 | Enter | Mengirim jawaban |
 
+Susunan ala keypad angka HP (1-2-3 di atas). Hapus dan Enter tampil sebagai ikon.
+
+```
+[ 1 ][ 2 ][ 3 ][ AC ]
+[ 4 ][ 5 ][ 6 ][ AC ]
+[ 7 ][ 8 ][ 9 ][ ⌫  ]
+[      0      ][ ↵  ]
+```
+
 ### Mekanik tali
 
 Posisi tali = jumlah benar host − jumlah benar Player 2. Nilai positif berarti tali condong ke kiri (host), negatif ke kanan (Player 2).
@@ -156,7 +165,7 @@ Kedua layar menampilkan arena yang sama dan sinkron: host di kiri, Player 2 di k
 - **Zona netral:** garis vertikal tebal semi-transparan di tengah arena; posisinya tetap.
 - **Penanda tali:** garis vertikal tipis di tengah tali; bergeser 1 langkah per jawaban benar, dan karakter yang tertinggal ikut terseret.
 - **Soal dan kolom jawaban:** soal milik pemain itu sendiri beserta jawaban yang sedang diketik.
-- **Keypad:** seperti kalkulator (lihat Gameplay).
+- **Keypad:** ala keypad angka HP (lihat Gameplay).
 - **Waktu:** sisa durasi permainan.
 - **Sinkronisasi:** posisi tali di kedua perangkat harus selalu sama.
 

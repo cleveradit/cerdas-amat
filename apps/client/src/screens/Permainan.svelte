@@ -151,11 +151,12 @@
     if (confirm(id.game.confirmLeave)) onLeave();
   }
 
+  // Susunan ala keypad HP; AC setinggi 2 baris mengisi kolom kanan baris kedua.
   const KEYS = [
+    ['1', '2', '3', 'ac'],
+    ['4', '5', '6'],
     ['7', '8', '9', 'del'],
-    ['4', '5', '6', 'ac'],
-    ['1', '2', '3', 'enter'],
-    ['0'],
+    ['0', 'enter'],
   ] as const;
   const label = (k: string) =>
     k === 'del' ? id.game.del : k === 'ac' ? id.game.ac : k === 'enter' ? id.game.enter : k;
@@ -223,11 +224,26 @@
           type="button"
           class="key"
           class:fn={k === 'del' || k === 'ac'}
+          class:ac={k === 'ac'}
+          class:del={k === 'del'}
           class:enter={k === 'enter'}
           class:zero={k === '0'}
+          aria-label={k === 'del' || k === 'enter' ? label(k) : undefined}
           disabled={!canAnswer}
-          onclick={() => press(k)}>{label(k)}</button
+          onclick={() => press(k)}
         >
+          {#if k === 'del'}
+            <svg viewBox="0 0 24 24" aria-hidden="true"
+              ><path d="M9 5h11v14H9l-6-7z" /><path d="m12 9 5 6m0-6-5 6" /></svg
+            >
+          {:else if k === 'enter'}
+            <svg viewBox="0 0 24 24" aria-hidden="true"
+              ><path d="M20 5v7H5" /><path d="m9 8-4 4 4 4" /></svg
+            >
+          {:else}
+            {label(k)}
+          {/if}
+        </button>
       {/each}
     {/each}
   </div>
