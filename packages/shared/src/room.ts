@@ -1,12 +1,17 @@
 export const CHARACTERS = ['kucing', 'beruang', 'rubah', 'panda', 'katak'] as const;
-export const DURATIONS = [30, 60, 90, 120] as const;
+/** Durasi `UNLIMITED` = tanpa batas: berakhir lewat KO, WO, menyerah, atau batas diam. */
+export const UNLIMITED = 0;
+export const DURATIONS = [30, 60, 90, 120, UNLIMITED] as const;
 
 export type Phase = 'lobby' | 'countdown' | 'playing' | 'paused' | 'result';
 export type SeatIndex = 0 | 1; // 0 = host (kiri), 1 = Player 2 (kanan)
 export type Character = (typeof CHARACTERS)[number];
 export type Duration = (typeof DURATIONS)[number];
-/** `surrender` = lawan menekan Keluar saat bermain; `void` = kedua pemain terputus. */
-export type ResultReason = 'ko' | 'time' | 'wo' | 'surrender' | 'void';
+/**
+ * `surrender` = lawan menekan Keluar saat bermain; `void` = kedua pemain terputus;
+ * `idle` = durasi tanpa batas dan tidak ada jawaban benar selama `IDLE_LIMIT_MS`.
+ */
+export type ResultReason = 'ko' | 'time' | 'wo' | 'surrender' | 'void' | 'idle';
 
 export interface Result {
   winner: SeatIndex | null; // null = seri atau batal

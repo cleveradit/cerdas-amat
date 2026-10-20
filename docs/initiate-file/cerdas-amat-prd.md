@@ -114,7 +114,7 @@ interface RoomState {
   code: string;
   phase: Phase;
   seats: [Seat | null, Seat | null];
-  durationSec: 30 | 60 | 90 | 120;
+  durationSec: 30 | 60 | 90 | 120 | 0; // 0 = tanpa batas
   score: [number, number];        // posisi tali = score[0] - score[1]
   qIndex: [number, number];       // nomor soal aktif per pemain
   decks: [[number, number][], [number, number][]];
@@ -123,7 +123,7 @@ interface RoomState {
   remainingMs?: number;           // sisa waktu saat jeda
   pause?: { seat: SeatIndex; until: number };
   // surrender = lawan menekan Keluar saat bermain; void = kedua pemain terputus
-  result?: { winner: SeatIndex | null; reason: 'ko' | 'time' | 'wo' | 'surrender' | 'void' };
+  result?: { winner: SeatIndex | null; reason: 'ko' | 'time' | 'wo' | 'surrender' | 'void' | 'idle' };
   resultAt?: number;              // awal layar hasil; dasar batas 30 detik kembali ke room
   emptySince?: number;
 }
@@ -157,7 +157,7 @@ Client dan server bertukar pesan JSON lewat satu WebSocket per pemain; tipe semu
 | --- | --- | --- |
 | `hello` | `token?`, `name`, `character` | Pertama setelah tersambung |
 | `setProfile` | `name`, `character` | `lobby` |
-| `setDuration` | `sec`: 30, 60, 90, atau 120 | `lobby`, khusus host |
+| `setDuration` | `sec`: 30, 60, 90, 120, atau 0 (tanpa batas) | `lobby`, khusus host |
 | `start` | – | `lobby`, khusus host, kedua kursi terisi dan ada di lobby |
 | `answer` | `q` (nomor soal), `value` | `playing` |
 | `backToRoom` | – | `result` atau `lobby` |
@@ -176,7 +176,7 @@ Client dan server bertukar pesan JSON lewat satu WebSocket per pemain; tipe semu
 | `reject` | `q`, `expected` (nomor soal yang benar menurut server) | Jawaban ditolak (fase bukan `playing`, nomor soal kedaluwarsa, atau nilai salah); client kembali ke soal `expected` |
 | `pause` | `seat`, `until`, `remainingMs` | Pemain terputus saat bermain |
 | `resume` | `endsAt` | Pemain kembali dalam 10 detik |
-| `result` | `winner`, `reason` (`ko`, `time`, `wo`, `surrender`, `void`), `score` | KO, waktu habis, WO, menyerah, atau batal |
+| `result` | `winner`, `reason` (`ko`, `time`, `wo`, `surrender`, `void`, `idle`), `score` | KO, waktu habis, WO, menyerah, batal, atau batas diam |
 | `error` | `code`, `message` | `ROOM_NOT_FOUND`, `ROOM_FULL`, `NOT_HOST`, `INVALID_MESSAGE`, `RATE_LIMITED`, `QUOTA` |
 | `sync` | `t`, `serverNow` | Balasan `sync` |
 
@@ -229,6 +229,8 @@ Permainan berjalan di empat fase server: `countdown`, `playing`, `paused`, dan `
 5. Selisih skor mencapai 5: server langsung mengirim `result` dengan alasan `ko`.
 
 **Akhir waktu:** alarm di `endsAt` menutup permainan dengan alasan `time`. Selisih positif = host menang, negatif = Player 2 menang, nol = seri. Client menampilkan sisa waktu dari `endsAt` dan selisih jam hasil `sync`, sehingga timer di kedua HP sama walau jam HP berbeda.
+
+**Tanpa batas (`durationSec: 0`):** tidak ada akhir waktu; timer menampilkan `∞`. Agar room yang dibiarkan menyala tidak menghabiskan kuota, `endsAt` dipakai sebagai batas diam: `endsAt = sekarang + 2 menit` saat mulai dan setiap jawaban benar. Alarm di `endsAt` menutup permainan dengan alasan `idle`, pemenang dari selisih seperti waktu habis. Jeda membekukan batas diam seperti sisa waktu.
 
 **Jeda karena putus koneksi:**
 

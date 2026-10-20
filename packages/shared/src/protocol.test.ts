@@ -25,10 +25,14 @@ describe('parseClientMessage', () => {
     expect(parseClientMessage(hello({ character: 'naga' }))).toBeNull();
   });
 
-  it('hanya menerima durasi 30, 60, 90, 120', () => {
+  it('hanya menerima durasi 30, 60, 90, 120, dan 0 (tanpa batas)', () => {
     expect(parseClientMessage('{"type":"setDuration","sec":90}')).toEqual({
       type: 'setDuration',
       sec: 90,
+    });
+    expect(parseClientMessage('{"type":"setDuration","sec":0}')).toEqual({
+      type: 'setDuration',
+      sec: 0,
     });
     expect(parseClientMessage('{"type":"setDuration","sec":45}')).toBeNull();
   });

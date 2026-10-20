@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Question, RoomSnapshot, SeatIndex } from '@cerdas-amat/shared';
+  import { UNLIMITED, type Question, type RoomSnapshot, type SeatIndex } from '@cerdas-amat/shared';
   import { onDestroy } from 'svelte';
   import { playSfx } from '../audio/audio';
   import Arena2D from '../components/Arena2D.svelte';
@@ -49,6 +49,7 @@
         ? room.remainingMs!
         : room.durationSec * 1000,
   );
+  const unlimited = $derived(room.durationSec === UNLIMITED);
   const countdown = $derived(
     room.phase === 'countdown' ? Math.max(1, Math.ceil((room.startsAt! - now) / 1000)) : null,
   );
@@ -151,11 +152,12 @@
     if (confirm(id.game.confirmLeave)) onLeave();
   }
 
+  // Susunan ala keypad HP; AC setinggi 2 baris mengisi kolom kanan baris kedua.
   const KEYS = [
+    ['1', '2', '3', 'ac'],
+    ['4', '5', '6'],
     ['7', '8', '9', 'del'],
-    ['4', '5', '6', 'ac'],
-    ['1', '2', '3', 'enter'],
-    ['0'],
+    ['0', 'enter'],
   ] as const;
   const label = (k: string) =>
     k === 'del' ? id.game.del : k === 'ac' ? id.game.ac : k === 'enter' ? id.game.enter : k;
@@ -171,8 +173,8 @@
     </span>
     <span
       class="timer"
-      class:low={room.phase === 'playing' && remainingMs <= LOW_TIME_MS}
-      data-testid="timer">{Math.ceil(remainingMs / 1000)}</span
+      class:low={!unlimited && room.phase === 'playing' && remainingMs <= LOW_TIME_MS}
+      data-testid="timer">{unlimited ? id.game.unlimited : Math.ceil(remainingMs / 1000)}</span
     >
     <span class="tag p2" class:me={mySeat === 1}>
       <strong class="score" data-testid="score-1">{room.score[1]}</strong>
@@ -223,11 +225,26 @@
           type="button"
           class="key"
           class:fn={k === 'del' || k === 'ac'}
+          class:ac={k === 'ac'}
+          class:del={k === 'del'}
           class:enter={k === 'enter'}
           class:zero={k === '0'}
+          aria-label={k === 'del' || k === 'enter' ? label(k) : undefined}
           disabled={!canAnswer}
-          onclick={() => press(k)}>{label(k)}</button
+          onclick={() => press(k)}
         >
+          {#if k === 'del'}
+            <svg viewBox="0 0 24 24" aria-hidden="true"
+              ><path d="M9 5h11v14H9l-6-7z" /><path d="m12 9 5 6m0-6-5 6" /></svg
+            >
+          {:else if k === 'enter'}
+            <svg viewBox="0 0 24 24" aria-hidden="true"
+              ><path d="M20 5v7H5" /><path d="m9 8-4 4 4 4" /></svg
+            >
+          {:else}
+            {label(k)}
+          {/if}
+        </button>
       {/each}
     {/each}
   </div>

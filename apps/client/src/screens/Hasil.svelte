@@ -42,6 +42,7 @@
       wo: won ? id.result.woWin : id.result.woLose,
       surrender: won ? id.result.surrenderWin : id.result.surrenderLose,
       void: id.result.voidReason,
+      idle: id.result.idle,
     }[result.reason],
   );
 

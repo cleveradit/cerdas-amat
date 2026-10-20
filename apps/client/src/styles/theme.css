@@ -258,8 +258,21 @@ select {
   font-weight: 700;
   font-size: 14px;
 }
-.key.enter {
+.key.ac {
   grid-row: span 2;
+}
+.key svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.key.enter {
   background: var(--sun);
   font-family: var(--body);
   font-weight: 700;

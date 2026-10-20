@@ -105,6 +105,11 @@ describe('lobby', () => {
 
     host.sock.send({ type: 'setDuration', sec: 90 });
     expect(((await p2.sock.next()) as RoomMsg).room.durationSec).toBe(90);
+
+    p2.sock.send({ type: 'setDuration', sec: 0 });
+    expect((await p2.sock.next()) as ErrorMsg).toMatchObject({ code: 'NOT_HOST' });
+    host.sock.send({ type: 'setDuration', sec: 0 });
+    expect(((await p2.sock.next()) as RoomMsg).room.durationSec).toBe(0);
   });
 
   it('durasi di luar pilihan ditolak sebagai INVALID_MESSAGE', async () => {
