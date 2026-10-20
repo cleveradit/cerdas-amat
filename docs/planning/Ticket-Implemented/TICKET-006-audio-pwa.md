@@ -1,7 +1,7 @@
 # Implementation Plan: TICKET-006 (Audio, Pengaturan, dan PWA)
 
 **Ticket:** `TICKET-006`  
-**Status:** `READY`  
+**Status:** `DONE`  
 **Target Audience:** AI Developer Agents  
 **Depends On:** `TICKET-005` (prop `notice` di `MenuUtama`)
 
