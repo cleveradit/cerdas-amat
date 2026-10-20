@@ -105,13 +105,15 @@ test('satu pertandingan sampai KO tanpa error audio, semua audio dari origin sen
   await expect(host.getByText('Menunggu pemain...')).toBeHidden();
 
   await host.getByRole('button', { name: 'Mulai' }).click();
+  await expect(host.getByTestId('game')).toBeVisible();
   await expect(host.getByTestId('countdown')).toBeHidden({ timeout: 5000 });
-  for (let i = 0; i < 5; i++) {
+  for (let i = 1; i <= 5; i++) {
     const [a, b] = (await host.getByTestId('question').textContent())!
       .split('×')
       .map((s) => Number(s.trim()));
     await host.keyboard.type(String(a! * b!));
     await host.keyboard.press('Enter');
+    if (i < 5) await expect(host.getByTestId('arena')).toHaveAttribute('data-diff', String(i));
   }
   await expect(host.getByTestId('result-title')).toHaveText('Kamu Menang');
   await expect(p2.getByTestId('result-title')).toHaveText('Kamu Kalah');
