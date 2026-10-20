@@ -1,9 +1,12 @@
 import {
   DECK_BATCH,
   HEARTBEAT_TIMEOUT_MS,
+  IDLE_LIMIT_MS,
   MAX_PAUSES,
   PAUSE_MS,
   RESULT_RETURN_MS,
+  UNLIMITED,
+  type Duration,
   type Question,
   type RoomState,
 } from '@cerdas-amat/shared';
@@ -31,11 +34,15 @@ interface Player {
 }
 
 /** Room berisi 2 pemain di fase `lobby`. */
-async function lobby() {
+async function lobby(sec?: Duration) {
   const code = await createRoom();
   const h = await join(code, 'Budi');
   const p = await join(code, 'Sari');
   await until(h.sock, 'room');
+  if (sec !== undefined) {
+    h.sock.send({ type: 'setDuration', sec });
+    await until(p.sock, 'room');
+  }
   const token = (w: typeof h.welcome) => (w.type === 'welcome' ? w.token : '');
   const host: Player = { sock: h.sock, token: token(h.welcome), deck: [], q: 0 };
   const p2: Player = { sock: p.sock, token: token(p.welcome), deck: [], q: 0 };
@@ -43,8 +50,8 @@ async function lobby() {
 }
 
 /** Host menekan Mulai; kembalikan pemain dengan deck masing-masing (fase `countdown`). */
-async function countdown() {
-  const room = await lobby();
+async function countdown(sec?: Duration) {
+  const room = await lobby(sec);
   room.host.sock.send({ type: 'start' });
   for (const pl of [room.host, room.p2]) {
     await until(pl.sock, 'countdown');
@@ -54,8 +61,8 @@ async function countdown() {
 }
 
 /** Lewati hitung mundur lewat alarm; fase `playing`. */
-async function playing() {
-  const room = await countdown();
+async function playing(sec?: Duration) {
+  const room = await countdown(sec);
   await editState(room.code, (s) => (s.startsAt = Date.now() - 1));
   await runDurableObjectAlarm(roomStub(room.code));
   return room;
@@ -190,6 +197,50 @@ describe('akhir waktu', () => {
     });
     await runDurableObjectAlarm(roomStub(b.code));
     expect(await until(b.host.sock, 'result')).toMatchObject({ winner: null, reason: 'time' });
+  });
+});
+
+describe('tanpa batas', () => {
+  it('tenggat awal = batas diam, timer tidak ada', async () => {
+    const { code } = await playing(UNLIMITED);
+    const s = await readState(code);
+    expect(s.durationSec).toBe(UNLIMITED);
+    expect(s.endsAt! - Date.now()).toBeGreaterThan(IDLE_LIMIT_MS - 5000);
+    expect(s.endsAt! - Date.now()).toBeLessThanOrEqual(IDLE_LIMIT_MS);
+  });
+
+  it('jawaban benar menghitung ulang batas diam', async () => {
+    const { code, host, p2 } = await playing(UNLIMITED);
+    await editState(code, (s) => (s.endsAt = Date.now() + 1000));
+    await answerAndWait(host, p2.sock);
+    const s = await readState(code);
+    expect(s.endsAt! - Date.now()).toBeGreaterThan(IDLE_LIMIT_MS - 5000);
+    await runDurableObjectAlarm(roomStub(code));
+    expect((await readState(code)).phase).toBe('playing');
+  });
+
+  it('KO tetap berlaku', async () => {
+    const { host, p2 } = await playing(UNLIMITED);
+    for (let i = 0; i < 5; i++) await answerAndWait(host, p2.sock);
+    expect(await until(p2.sock, 'result')).toMatchObject({ winner: 0, reason: 'ko' });
+  });
+
+  it('batas diam habis: unggul menang, sama = seri, alasan idle', async () => {
+    const a = await playing(UNLIMITED);
+    await editState(a.code, (s) => {
+      s.score = [2, 1];
+      s.endsAt = Date.now() - 1;
+    });
+    await runDurableObjectAlarm(roomStub(a.code));
+    expect(await until(a.p2.sock, 'result')).toMatchObject({ winner: 0, reason: 'idle' });
+
+    const b = await playing(UNLIMITED);
+    await editState(b.code, (s) => {
+      s.score = [1, 1];
+      s.endsAt = Date.now() - 1;
+    });
+    await runDurableObjectAlarm(roomStub(b.code));
+    expect(await until(b.host.sock, 'result')).toMatchObject({ winner: null, reason: 'idle' });
   });
 });
 

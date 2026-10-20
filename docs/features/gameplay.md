@@ -4,7 +4,7 @@
 
 ## Summary
 
-Host menekan Mulai, server memasang hitung mundur 3 detik dan mengirim deck 162 soal ke tiap pemain. Client mencocokkan jawaban secara lokal dan hanya mengirim jawaban benar; server memvalidasi, menaikkan skor, dan mengirim `tug` ke kedua pemain sehingga tali di kedua layar selalu sama. Pertandingan berakhir karena KO (selisih 5), waktu habis, WO, menyerah, atau batal, lalu pemain kembali ke lobby room yang sama.
+Host menekan Mulai, server memasang hitung mundur 3 detik dan mengirim deck 162 soal ke tiap pemain. Client mencocokkan jawaban secara lokal dan hanya mengirim jawaban benar; server memvalidasi, menaikkan skor, dan mengirim `tug` ke kedua pemain sehingga tali di kedua layar selalu sama. Pertandingan berakhir karena KO (selisih 5), waktu habis, WO, menyerah, batal, atau batas diam (durasi tanpa batas), lalu pemain kembali ke lobby room yang sama.
 
 ## Quick Reference
 
@@ -13,7 +13,7 @@ Host menekan Mulai, server memasang hitung mundur 3 detik dan mengirim deck 162 
 | `countdown` | Host `start` (kedua kursi terisi, tersambung, di lobby) | Alarm di `startsAt` → `playing`; pemain putus → `lobby` |
 | `playing` | Hitung mundur selesai; jeda selesai | KO, `endsAt`, pemain putus (→ `paused`), Keluar |
 | `paused` | Pemain putus dengan jatah jeda < 3 | Pemilik jeda kembali (→ `playing`), `pause.until` lewat (WO atau `void`) |
-| `result` | KO, waktu habis, WO, `surrender`, `void` | Penekan pertama Kembali ke room (→ `lobby`) |
+| `result` | KO, waktu habis, WO, `surrender`, `void`, `idle` | Penekan pertama Kembali ke room (→ `lobby`) |
 
 | Konstanta (`packages/shared/src/result.ts`) | Nilai |
 |---|---|
@@ -41,6 +41,7 @@ Host menekan Mulai, server memasang hitung mundur 3 detik dan mengirim deck 162 
 - Setiap `save()` memasang ulang alarm, termasuk heartbeat `now + 5 detik` selama bermain; alarm heartbeat juga menulis storage, sehingga skor yang belum ditulis paling lama tertunda 5 detik.
 - `removeSeat(0)` menghapus `result` di state karena nomor kursi bergeser. Client menyalin hasil saat pesan `result` tiba (`shownResult`), bukan dari snapshot.
 - Pemain yang tersambung ulang saat fase sudah `lobby` tetapi kursinya masih `inLobby: false` otomatis mengirim `backToRoom`, karena hasilnya sudah tidak ada di snapshot.
+- Durasi tanpa batas (`durationSec: 0`) tetap memakai `endsAt`, tetapi sebagai batas diam 2 menit (`IDLE_LIMIT_MS`) yang dihitung ulang tiap jawaban benar tanpa pesan ke client; tulisan storage tetap dibatasi 1 per detik, jadi alarm bisa berbunyi di tenggat lama dan hanya memasang ulang.
 - Tes e2e waktu habis memakai durasi 30 detik penuh (sekitar 1 menit untuk menang lalu seri); tidak ada jam yang disuntikkan.
 
 ## Related

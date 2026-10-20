@@ -9,6 +9,7 @@ import {
   DECK_REFILL_AT,
   HEARTBEAT_MS,
   HEARTBEAT_TIMEOUT_MS,
+  IDLE_LIMIT_MS,
   isBadName,
   koWinner,
   makeDeck,
@@ -27,6 +28,7 @@ import {
   type RoomState,
   type SeatIndex,
   type ServerMessage,
+  UNLIMITED,
 } from '@cerdas-amat/shared';
 import { DurableObject } from 'cloudflare:workers';
 
@@ -193,11 +195,15 @@ export class Room extends DurableObject<Env> {
 
     if (state.phase === 'countdown' && state.startsAt! <= now) {
       state.phase = 'playing';
-      state.endsAt = state.startsAt! + state.durationSec * 1000;
+      state.endsAt = deadlineFrom(state, state.startsAt!);
       delete state.startsAt;
     }
     if (state.phase === 'playing' && state.endsAt! <= now) {
-      this.finish(state, 'time', timeWinner(state.score));
+      this.finish(
+        state,
+        state.durationSec === UNLIMITED ? 'idle' : 'time',
+        timeWinner(state.score),
+      );
     }
     if (state.phase === 'paused' && state.pause!.until <= now) {
       const rival = other(state.pause!.seat);
@@ -306,6 +312,8 @@ export class Room extends DurableObject<Env> {
     }
     state.qIndex[index]++;
     state.score[index]++;
+    // Batas diam dihitung ulang; alarm yang berbunyi di tenggat lama hanya memasang ulang alarm.
+    if (state.durationSec === UNLIMITED) state.endsAt = deadlineFrom(state, Date.now());
 
     const deck = state.decks[index];
     if (deck.length - state.qIndex[index] <= DECK_BATCH - DECK_REFILL_AT) {
@@ -506,6 +514,11 @@ export class Room extends DurableObject<Env> {
     if (deadlines.length) await this.ctx.storage.setAlarm(Math.min(...deadlines));
     else await this.ctx.storage.deleteAlarm();
   }
+}
+
+/** Tenggat `endsAt` dihitung dari `from`: akhir waktu, atau batas diam untuk durasi tanpa batas. */
+function deadlineFrom(state: RoomState, from: number): number {
+  return from + (state.durationSec === UNLIMITED ? IDLE_LIMIT_MS : state.durationSec * 1000);
 }
 
 /** Dua deck berturut-turut (162 soal) dengan sambungan yang aman. */

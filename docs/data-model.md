@@ -30,13 +30,13 @@ Tidak ada database eksternal (keputusan produk no. 5).
 | `RoomState` | `code` | `string` | 5 karakter dari `ABCDEFGHJKMNPQRSTUVWXYZ23456789` (`ROOM_CODE_ALPHABET`) |
 | `RoomState` | `phase` | `Phase` | Awal `lobby` |
 | `RoomState` | `seats` | `[Seat \| null, Seat \| null]` | Indeks 0 = host; `seats[0] === null` berarti `seats[1]` juga `null` (Player 2 selalu digeser ke kursi 0) |
-| `RoomState` | `durationSec` | `Duration` (`30 \| 60 \| 90 \| 120`) | Awal `60`; hanya kursi 0 yang boleh mengubah |
+| `RoomState` | `durationSec` | `Duration` (`30 \| 60 \| 90 \| 120 \| 0`) | Awal `60`; `0` = tanpa batas (`UNLIMITED`); hanya kursi 0 yang boleh mengubah |
 | `RoomState` | `score` | `[number, number]` | Jawaban benar per kursi; posisi tali = `score[0] - score[1]`; selisih 5 = KO |
 | `RoomState` | `qIndex` | `[number, number]` | Nomor soal aktif per kursi; jawaban hanya diterima untuk nomor ini |
 | `RoomState` | `decks` | `[Question[], Question[]]` | 162 soal saat Mulai, +81 saat `qIndex` mencapai 150; tidak pernah ada di snapshot |
-| `RoomState` | `startsAt` / `endsAt` | `number?` | Epoch ms; akhir hitung mundur (3 detik) / akhir permainan |
+| `RoomState` | `startsAt` / `endsAt` | `number?` | Epoch ms; akhir hitung mundur (3 detik) / akhir permainan (durasi tanpa batas: batas diam 2 menit sejak jawaban benar terakhir) |
 | `RoomState` | `remainingMs` / `pause` | `number?` / `{ seat, until }?` | Hanya saat `paused`; `until` = 10 detik setelah terputus |
-| `RoomState` | `result` / `resultAt` | `{ winner, reason }?` / `number?` | `reason`: `ko`, `time`, `wo`, `surrender`, `void`; `result` dihapus saat fase kembali ke `lobby` atau kursi bergeser |
+| `RoomState` | `result` / `resultAt` | `{ winner, reason }?` / `number?` | `reason`: `ko`, `time`, `wo`, `surrender`, `void`, `idle`; `result` dihapus saat fase kembali ke `lobby` atau kursi bergeser |
 | `RoomState` | `emptySince` | `number?` | Epoch ms; diisi saat `init()` dan saat kursi 0 kosong, dihapus saat ada yang masuk |
 | `Seat` | `token` | `string` | `crypto.randomUUID()`; tidak pernah ada di `RoomSnapshot` |
 | `Seat` | `name` | `string` | Di-trim, 1–12 karakter (`NAME_MAX`); nama yang `isBadName` diganti `randomName()` oleh server |
@@ -51,6 +51,6 @@ Tidak ada database eksternal (keputusan produk no. 5).
 |---|---|---|
 | `Phase` | `lobby`, `countdown`, `playing`, `paused`, `result` | `room.ts` |
 | `SeatIndex` | `0` (host), `1` (Player 2) | `room.ts` |
-| `ResultReason` | `ko`, `time`, `wo`, `surrender`, `void` | `room.ts` |
+| `ResultReason` | `ko`, `time`, `wo`, `surrender`, `void`, `idle` | `room.ts` |
 | `ErrorCode` | `ROOM_NOT_FOUND`, `ROOM_FULL`, `NOT_HOST`, `INVALID_MESSAGE`, `RATE_LIMITED`, `QUOTA` | `protocol.ts` |
 | Close code | `4000` heartbeat (client tersambung ulang), `4400` tidak valid, `4404` room tidak ada, `4409` room penuh, `4429` terlalu banyak kode salah, `4503` kuota habis | `protocol.ts` |

@@ -8,7 +8,7 @@ Dua pemain beradu menjawab soal perkalian di perangkat masing-masing. Setiap jaw
 
 - **Pemain:** 2 orang, perangkat terpisah, terhubung real-time lewat kode room.
 - **Soal:** perkalian 1–9 × 1–9, acak dan terpisah untuk tiap pemain, tingkat kesulitan setara.
-- **Durasi:** 30, 60, 90, atau 120 detik, dipilih host.
+- **Durasi:** 30, 60, 90, 120 detik, atau tanpa batas, dipilih host. Tanpa batas berakhir lewat KO, WO, atau jika 2 menit tidak ada jawaban benar (dinilai dari selisih).
 - **Menang:** KO saat selisih jawaban benar mencapai 5, unggul selisih saat waktu habis, atau WO jika lawan tidak tersambung kembali dalam 10 detik.
 - **Seri:** waktu habis dengan penanda tali tepat di garis netral (selisih 0).
 - **Karakter:** 5 karakter hewan bergaya blocky/voxel dengan desain orisinal.
@@ -85,7 +85,7 @@ Host membuat room dan membagikan kode unik ke Player 2. Setelah keduanya ada di 
 - **Slot kiri (host):** avatar dan nama host.
 - **Slot kanan (Player 2):** avatar dan nama Player 2; bertuliskan "Menunggu pemain..." selama belum ada yang bergabung.
 - **Tombol pilih karakter:** membuka layar pilih karakter, Back kembali ke lobby.
-- **Durasi (khusus host):** 30, 60, 90, atau 120 detik.
+- **Durasi (khusus host):** 30, 60, 90, 120 detik, atau tanpa batas (timer menampilkan ∞).
 - **Tombol Mulai (khusus host):** aktif setelah Player 2 bergabung.
 
 ### Memulai permainan

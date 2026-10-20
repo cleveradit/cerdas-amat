@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Question, RoomSnapshot, SeatIndex } from '@cerdas-amat/shared';
+  import { UNLIMITED, type Question, type RoomSnapshot, type SeatIndex } from '@cerdas-amat/shared';
   import { onDestroy } from 'svelte';
   import { playSfx } from '../audio/audio';
   import Arena2D from '../components/Arena2D.svelte';
@@ -49,6 +49,7 @@
         ? room.remainingMs!
         : room.durationSec * 1000,
   );
+  const unlimited = $derived(room.durationSec === UNLIMITED);
   const countdown = $derived(
     room.phase === 'countdown' ? Math.max(1, Math.ceil((room.startsAt! - now) / 1000)) : null,
   );
@@ -172,8 +173,8 @@
     </span>
     <span
       class="timer"
-      class:low={room.phase === 'playing' && remainingMs <= LOW_TIME_MS}
-      data-testid="timer">{Math.ceil(remainingMs / 1000)}</span
+      class:low={!unlimited && room.phase === 'playing' && remainingMs <= LOW_TIME_MS}
+      data-testid="timer">{unlimited ? id.game.unlimited : Math.ceil(remainingMs / 1000)}</span
     >
     <span class="tag p2" class:me={mySeat === 1}>
       <strong class="score" data-testid="score-1">{room.score[1]}</strong>
