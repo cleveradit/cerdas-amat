@@ -5,7 +5,16 @@ export const id = {
   title: 'Tarik Tambang Matematika',
   menu: {
     play: 'Play',
+    settings: 'Pengaturan',
     character: 'Pilih Karakter',
+    offline: 'Butuh koneksi internet untuk bermain',
+  },
+  settings: {
+    title: 'Pengaturan',
+    music: 'Musik latar',
+    sfx: 'Efek suara',
+    percent: (n: number) => `${n}%`,
+    close: 'Tutup',
   },
   play: {
     title: 'Play',

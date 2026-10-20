@@ -1,6 +1,6 @@
 # Architecture Map
 
-**Status:** Sebagian rencana. Kerangka monorepo, CI/CD (Fase 1), room dan lobby (Fase 2), gameplay (Fase 3: fase permainan, jeda, hasil, layar Permainan/Hasil, tes Playwright), visual (Fase 4: karakter voxel, renderer bersama, arena 3D, tema UI), dan keamanan Fase 5 (filter nama, rate limit, cek Origin, kuota habis, Bagikan) sudah ada; audio dan PWA belum. Komponen lain diturunkan dari [PRD Teknis](initiate-file/tarik-tambang-matematika-prd.md) dan wajib diverifikasi ulang terhadap kode setelah tiap fase selesai.
+**Status:** Sebagian rencana. Kerangka monorepo, CI/CD (Fase 1), room dan lobby (Fase 2), gameplay (Fase 3: fase permainan, jeda, hasil, layar Permainan/Hasil, tes Playwright), visual (Fase 4: karakter voxel, renderer bersama, arena 3D, tema UI), dan Fase 5 (filter nama, rate limit, cek Origin, kuota habis, Bagikan, audio, Pengaturan, PWA, pesan offline) sudah ada; uji di perangkat nyata (Fase 6) belum. Komponen lain diturunkan dari [PRD Teknis](initiate-file/tarik-tambang-matematika-prd.md) dan wajib diverifikasi ulang terhadap kode setelah tiap fase selesai.
 
 ## Summary
 

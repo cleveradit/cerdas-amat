@@ -106,18 +106,18 @@ Rules:
 
 | Case | Input | Expected Result | Status |
 |---|---|---|---|
-| Volume default (unit) | localStorage kosong | `loadVolumes()` = `{ music: 50, sfx: 80 }` | `[ ]` |
-| Volume rusak (unit, failure) | `cerdas-amat:volume` = `"x"`, dan `{ music: 150, sfx: -5 }` | Default dipakai | `[ ]` |
-| Volume batas (unit, boundary) | `{ music: 0, sfx: 100 }` disimpan lalu dimuat | Nilai sama persis | `[ ]` |
-| Pengaturan tersimpan (e2e) | Buka Pengaturan, geser musik ke 0 dan efek suara ke 40, reload | Slider menampilkan 0 dan 40 | `[ ]` |
-| Audio tanpa error (e2e) | Mainkan satu pertandingan sampai KO | Tidak ada error/warning `AudioContext` di console; semua request audio ke origin sendiri | `[ ]` |
-| Audio sebelum gestur (e2e, boundary) | Buka `?room=KODE` tanpa klik apa pun | Tidak ada error di console; audio dibuka setelah klik pertama | `[ ]` |
-| Offline (e2e, failure) | `context.setOffline(true)` di menu | Teks "Butuh koneksi internet untuk bermain" tampil, Play nonaktif; kembali online → teks hilang | `[ ]` |
-| Manifest (e2e) | `GET /manifest.webmanifest` dari hasil build (`vite preview`) | `display` `standalone`, `orientation` `portrait`, ikon 192 dan 512 tersaji `200` | `[ ]` |
-| Service worker (e2e) | Buka hasil build | `navigator.serviceWorker.ready` selesai; reload saat offline tetap menampilkan menu dengan pesan offline | `[ ]` |
-| Installable (manual) | Preview PR di Chrome DevTools → Application → Manifest | Tidak ada error installability | `[ ]` |
-| Ukuran aset (manual) | `du` di `apps/client/public/audio` | Sesuai batas di Business Decision; `CREDITS.md` lengkap untuk 10 file | `[ ]` |
-| Tes lama dan fps | `pnpm e2e`, `pnpm perf` | Semua lulus; fps tetap ≥ 30 rata-rata | `[ ]` |
+| Volume default (unit) | localStorage kosong | `loadVolumes()` = `{ music: 50, sfx: 80 }` | `[x]` |
+| Volume rusak (unit, failure) | `cerdas-amat:volume` = `"x"`, dan `{ music: 150, sfx: -5 }` | Default dipakai | `[x]` |
+| Volume batas (unit, boundary) | `{ music: 0, sfx: 100 }` disimpan lalu dimuat | Nilai sama persis | `[x]` |
+| Pengaturan tersimpan (e2e) | Buka Pengaturan, geser musik ke 0 dan efek suara ke 40, reload | Slider menampilkan 0 dan 40 | `[x]` |
+| Audio tanpa error (e2e) | Mainkan satu pertandingan sampai KO | Tidak ada error/warning `AudioContext` di console; semua request audio ke origin sendiri | `[x]` |
+| Audio sebelum gestur (e2e, boundary) | Buka `?room=KODE` tanpa klik apa pun | Tidak ada error di console; audio dibuka setelah klik pertama | `[x]` |
+| Offline (e2e, failure) | `context.setOffline(true)` di menu | Teks "Butuh koneksi internet untuk bermain" tampil, Play nonaktif; kembali online → teks hilang | `[x]` |
+| Manifest (e2e) | `GET /manifest.webmanifest` dari hasil build (`vite preview`) | `display` `standalone`, `orientation` `portrait`, ikon 192 dan 512 tersaji `200` | `[x]` |
+| Service worker (e2e) | Buka hasil build | `navigator.serviceWorker.ready` selesai; reload saat offline tetap menampilkan menu dengan pesan offline | `[x]` |
+| Installable (manual) | Preview PR di Chrome DevTools → Application → Manifest | Tidak ada error installability | `[x]` |
+| Ukuran aset (manual) | `du` di `apps/client/public/audio` | Sesuai batas di Business Decision; `CREDITS.md` lengkap untuk 10 file | `[x]` |
+| Tes lama dan fps | `pnpm e2e`, `pnpm perf` | Semua lulus; fps tetap ≥ 30 rata-rata | `[x]` |
 
 ---
 
@@ -149,14 +149,25 @@ Expected:
 
 ## 8. Completion Checklist
 
-- [ ] Section 1 fully filled and status set correctly.
-- [ ] All Non-Negotiable Technical Contract items implemented.
-- [ ] Acceptance Test Matrix completed.
-- [ ] Verification commands executed successfully.
-- [ ] No out-of-scope changes introduced.
+- [x] Section 1 fully filled and status set correctly.
+- [x] All Non-Negotiable Technical Contract items implemented.
+- [x] Acceptance Test Matrix completed.
+- [x] Verification commands executed successfully.
+- [x] No out-of-scope changes introduced.
 
 ---
 
 ## 9. Hasil Verifikasi
 
-_Diisi oleh session implementasi, termasuk penyimpangan dari kontrak._
+1. `pnpm lint`, `typecheck`, `test` (shared 28, client 13, worker 49 tes), dan `build` lulus. Bundle awal: JS 81,1 kB (gzip 30,1 kB), CSS 27,3 kB (gzip 8,2 kB); dibanding TICKET-004 (JS 73,9 kB) selisih +7,2 kB, sebagian dari TICKET-005. Audio tidak masuk bundle JS (dimuat dari `/audio/*.mp3`). Precache service worker: 50 file, sekitar 2,5 MB.
+2. `pnpm e2e`: 17 tes lulus (11 lama + 4 di `e2e/audio.spec.ts` + 2 di `e2e/pwa.spec.ts`). Tes audio juga men-decode ke-10 file di Chromium.
+3. `pnpm perf`: rata-rata 59,9 fps, detik terendah 59 fps.
+4. Installable: diganti pemeriksaan otomatis lewat CDP `Page.getInstallabilityErrors` dan `Page.getAppManifest` pada hasil build (`vite preview`): tidak ada error. Tetap perlu dicek di preview PR.
+5. Ukuran aset: total audio 1,65 MB; musik `music-menu.mp3` 848 kB (106 detik), `music-game.mp3` 769 kB (64 detik); efek suara 1,3–9,7 kB. `CREDITS.md` mencatat 10 file.
+6. Loop musik: hasil decode Chromium sama panjang sampel dengan WAV asli (tanpa padding encoder). Safari belum diuji (Fase 6).
+7. Pemilihan audio dilakukan tanpa mendengar: efek suara dipilih dari durasi/kenyaringan, jingle menang/kalah dari arah nada (naik/turun), musik dari tempo (menu sekitar 72 bpm, game sekitar 90 bpm). Perlu didengar user saat review PR.
+8. Penyesuaian dari kontrak:
+   - `playwright.config.ts`: dua proyek (`dev`, `pwa`) dan webServer kedua (`build` + `vite preview` port 4173) untuk tes manifest/service worker; `pnpm e2e` jadi mem-build client dulu.
+   - `includeManifestIcons: false` di `VitePWA`, karena ikon sudah masuk lewat `globPatterns` dan tercatat dua kali.
+   - `icon.svg` dibuat dari data voxel `kucing()` (proyeksi oblique) dengan skrip sekali pakai yang tidak di-commit; sumber ikon tetap `apps/client/pwa/icon.svg`.
+   - Unit test volume di file baru `apps/client/src/lib/storage.test.ts`.

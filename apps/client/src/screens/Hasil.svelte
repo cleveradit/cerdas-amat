@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { Character, Result, SeatIndex } from '@cerdas-amat/shared';
+  import { onMount } from 'svelte';
+  import { playSfx } from '../audio/audio';
   import Stage3D from '../components/Stage3D.svelte';
   import { id } from '../i18n/id';
   import { stage } from '../lib/stage.svelte';
@@ -42,6 +44,11 @@
       void: id.result.voidReason,
     }[result.reason],
   );
+
+  // Jingle hasil sekali saat layar tampil; pertandingan dibatalkan tanpa jingle.
+  onMount(() => {
+    if (result.reason !== 'void') playSfx(result.winner === null ? 'draw' : won ? 'win' : 'lose');
+  });
 
   let view = $state.raw<View | null>(null);
   $effect(() => {

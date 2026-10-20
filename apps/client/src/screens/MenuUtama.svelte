@@ -3,9 +3,17 @@
 
   let {
     notice,
+    offline,
     onPlay,
+    onSettings,
     onCharacter,
-  }: { notice: string | null; onPlay: () => void; onCharacter: () => void } = $props();
+  }: {
+    notice: string | null;
+    offline: boolean;
+    onPlay: () => void;
+    onSettings: () => void;
+    onCharacter: () => void;
+  } = $props();
 </script>
 
 <section class="screen menu">
@@ -13,7 +21,8 @@
     <h1>{id.title}</h1>
   </div>
   {#if notice}<p class="error" role="alert">{notice}</p>{/if}
-  <button type="button" class="primary" onclick={onPlay}>{id.menu.play}</button>
+  <button type="button" class="primary" disabled={offline} onclick={onPlay}>{id.menu.play}</button>
+  <button type="button" onclick={onSettings}>{id.menu.settings}</button>
   <button type="button" onclick={onCharacter}>{id.menu.character}</button>
 </section>
 
