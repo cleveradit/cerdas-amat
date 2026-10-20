@@ -1,6 +1,7 @@
 import {
   CLOSE_HEARTBEAT,
   CLOSE_INVALID,
+  CLOSE_RATE_LIMITED,
   CLOSE_ROOM_FULL,
   CLOSE_ROOM_NOT_FOUND,
   COUNTDOWN_MS,
@@ -8,12 +9,14 @@ import {
   DECK_REFILL_AT,
   HEARTBEAT_MS,
   HEARTBEAT_TIMEOUT_MS,
+  isBadName,
   koWinner,
   makeDeck,
   MAX_INVALID_MESSAGES,
   MAX_PAUSES,
   parseClientMessage,
   PAUSE_MS,
+  randomName,
   RESULT_RETURN_MS,
   timeWinner,
   type ClientMessage,
@@ -92,9 +95,17 @@ export class Room extends DurableObject<Env> {
     setAttachment(server, { seat: null, invalid: 0, since: Date.now() });
     if (!this.state) {
       // Browser tidak bisa membaca status HTTP upgrade yang gagal, jadi
-      // "room tidak ada" dikirim sebagai pesan + close code.
-      sendError(server, 'ROOM_NOT_FOUND');
-      server.close(CLOSE_ROOM_NOT_FOUND, 'ROOM_NOT_FOUND');
+      // "room tidak ada" dikirim sebagai pesan + close code. Hanya DO yang tahu
+      // kode ini salah, jadi batas tebakan kode per IP dihitung di sini.
+      const ip = request.headers.get('CF-Connecting-IP') ?? 'local';
+      const { success } = await this.env.JOIN_LIMIT.limit({ key: ip });
+      if (success) {
+        sendError(server, 'ROOM_NOT_FOUND');
+        server.close(CLOSE_ROOM_NOT_FOUND, 'ROOM_NOT_FOUND');
+      } else {
+        sendError(server, 'RATE_LIMITED');
+        server.close(CLOSE_RATE_LIMITED, 'RATE_LIMITED');
+      }
     }
     return new Response(null, { status: 101, webSocket: client });
   }
@@ -145,7 +156,7 @@ export class Room extends DurableObject<Env> {
         return this.startCountdown(state);
       case 'setProfile':
         if (state.phase !== 'lobby') return this.rejectInvalid(ws);
-        seat.name = msg.name;
+        seat.name = safeName(msg.name);
         seat.character = msg.character;
         break;
       case 'setDuration':
@@ -236,7 +247,7 @@ export class Room extends DurableObject<Env> {
       seat.connected = true;
       delete seat.disconnectedAt;
       if (state.phase === 'lobby') {
-        seat.name = msg.name;
+        seat.name = safeName(msg.name);
         seat.character = msg.character;
       }
     } else {
@@ -248,7 +259,7 @@ export class Room extends DurableObject<Env> {
       }
       state.seats[index] = {
         token: crypto.randomUUID(),
-        name: msg.name,
+        name: safeName(msg.name),
         character: msg.character,
         connected: true,
         inLobby: true,
@@ -525,6 +536,11 @@ function snapshot(state: RoomState): RoomSnapshot {
   };
 }
 
+/** Server penentu filter nama: nama kasar diganti nama acak. */
+function safeName(name: string): string {
+  return isBadName(name) ? randomName() : name;
+}
+
 function findSeatByToken(state: RoomState, token: string): SeatIndex | null {
   if (state.seats[0]?.token === token) return 0;
   if (state.seats[1]?.token === token) return 1;
@@ -552,6 +568,8 @@ const ERROR_TEXT: Record<ErrorCode, string> = {
   ROOM_FULL: 'Room sudah penuh',
   NOT_HOST: 'Hanya host yang boleh melakukan ini',
   INVALID_MESSAGE: 'Pesan tidak valid',
+  RATE_LIMITED: 'Terlalu banyak kode salah',
+  QUOTA: 'Kuota server habis',
 };
 
 function sendError(ws: WebSocket, code: ErrorCode): void {

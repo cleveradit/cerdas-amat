@@ -34,7 +34,7 @@ describe('POST /api/rooms', () => {
 describe('GET /ws/:code', () => {
   it('kode berformat salah dibalas 404 tanpa upgrade', async () => {
     const res = await exports.default.fetch('https://example.com/ws/OOOOO', {
-      headers: { Upgrade: 'websocket' },
+      headers: { Upgrade: 'websocket', Origin: 'https://example.com' },
     });
     expect(res.status).toBe(404);
   });

@@ -1,7 +1,7 @@
 # Implementation Plan: TICKET-004 (Visual)
 
 **Ticket:** `TICKET-004`  
-**Status:** `READY`  
+**Status:** `DONE`  
 **Target Audience:** AI Developer Agents  
 **Depends On:** `TICKET-003` (DONE)
 
@@ -169,7 +169,7 @@ Expected:
 2. Ukuran bundle awal: JS 73,9 kB (gzip 27,7 kB) + CSS 27,0 kB (gzip 8,1 kB). Modul 3D di-import dinamis: `engine` 353,6 kB (gzip 85,3 kB), `rig` 188,7 kB (gzip 51,4 kB), view < 2 kB per layar. Font: browser hanya mengunduh subset latin.
 3. `pnpm e2e`: 8 tes (4 tes TICKET-003 + 4 tes `visual.spec.ts`) lulus 2× berturut-turut dengan GPU (sekitar 1,4 menit), dan 1× dengan WebGL perangkat lunak seperti runner CI (2 menit; tes terlama 84 detik).
 4. `pnpm perf` (Intel HD 620, Chromium headless dengan `--enable-gpu`, 360×740, DPR 2, CPU 6×): 60 fps setiap detik selama 10 detik.
-5. Kalibrasi warna: 5 avatar game dibandingkan per piksel dengan avatar preview r128 di browser yang sama; selisih maksimum per kanal 0 untuk kelima karakter. Screenshot berdampingan (kiri preview, kanan game): [TICKET-004-kalibrasi.png](Ticket-Implemented/assets/TICKET-004-kalibrasi.png).
+5. Kalibrasi warna: 5 avatar game dibandingkan per piksel dengan avatar preview r128 di browser yang sama; selisih maksimum per kanal 0 untuk kelima karakter. Screenshot berdampingan (kiri preview, kanan game): [TICKET-004-kalibrasi.png](assets/TICKET-004-kalibrasi.png).
 6. Data voxel: isi peta tiap bagian (kunci, warna, urutan) identik dengan hasil menjalankan kode preview; jumlah voxel dikunci di snapshot `characters.test.ts`.
 7. Gerak dikurangi: dengan `reducedMotion: 'reduce'` media query aktif; putaran preview (0,35 rad/detik) dan amplitudo animasi memakai `reducedMotion()`, goyang jawaban salah dimatikan lewat `@media (prefers-reduced-motion: reduce)`.
 8. Penyesuaian dari kontrak:
@@ -177,3 +177,6 @@ Expected:
    - `three/engine.ts` (renderer, di-import dinamis) dan `three/common.ts` (lampu, bayangan) ditambahkan agar `stage.ts` tidak membawa Three.js ke bundle awal.
    - `e2e/match.spec.ts` mendapat `afterEach` yang menutup konteks browser; isi tes tidak berubah. Tanpa ini, halaman tes sebelumnya terus merender 3D dan tes putus koneksi gagal (selisih timer > 1 detik).
    - `playwright.config.ts`: batas waktu tes 90 → 120 detik dan Chromium memakai GPU jika tersedia.
+9. Review: tes `pnpm perf` sempat gagal acak karena tidak menunggu layar permainan sebelum cek hitung mundur; diperbaiki di PR yang sama (`fa20947`), lalu lulus (rata-rata 59,4 fps, detik terendah 54).
+10. PR #5: CI hijau (termasuk `pnpm e2e` dan smoke test preview).
+11. Merge ke `main`: workflow Deploy sukses. Terhadap `https://cerdas-amat.radlabs.my.id`, 7 dari 8 tes e2e lulus. Tes "semua request ke origin sendiri" gagal hanya karena Cloudflare Web Analytics menyisipkan `static.cloudflareinsights.com/beacon.min.js` di domain produksi (pengaturan dasbor Cloudflare, bukan kode game; tidak terjadi di lokal dan preview).

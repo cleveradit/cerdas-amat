@@ -1,5 +1,7 @@
 import {
   CLOSE_INVALID,
+  CLOSE_QUOTA,
+  CLOSE_RATE_LIMITED,
   CLOSE_ROOM_FULL,
   CLOSE_ROOM_NOT_FOUND,
   type ClientMessage,
@@ -14,7 +16,13 @@ const RETRY_STEADY_MS = 4000;
 const PING_INTERVAL_MS = 5000;
 const SYNC_INTERVAL_MS = 30_000;
 /** Close code dari server yang berarti mencoba lagi tidak ada gunanya. */
-const FINAL_CLOSE_CODES = new Set([CLOSE_ROOM_NOT_FOUND, CLOSE_ROOM_FULL, CLOSE_INVALID]);
+const FINAL_CLOSE_CODES = new Set([
+  CLOSE_ROOM_NOT_FOUND,
+  CLOSE_ROOM_FULL,
+  CLOSE_INVALID,
+  CLOSE_RATE_LIMITED,
+  CLOSE_QUOTA,
+]);
 
 /**
  * Satu WebSocket ke room. Tersambung ulang otomatis (0,5 s, 1 s, 2 s, lalu tiap 4 s,
@@ -26,10 +34,16 @@ export class RoomClient {
   onStatus: (status: ConnectionStatus, closeCode?: number) => void = () => {};
   /** Dipanggil setiap kali socket terbuka, termasuk setelah tersambung ulang. */
   onOpen: () => void = () => {};
+  /**
+   * Dipanggil sekali per `connect()` bila socket tertutup sebelum pernah terbuka;
+   * percobaan ulang tetap berjalan. Dipakai untuk mendeteksi kuota Worker habis.
+   */
+  onFirstOpenFailed: () => void = () => {};
 
   private code = '';
   private ws: WebSocket | null = null;
   private attempt = 0;
+  private everOpened = false;
   private stopped = true;
   private retryTimer: ReturnType<typeof setTimeout> | undefined;
   private pingTimer: ReturnType<typeof setInterval> | undefined;
@@ -44,6 +58,7 @@ export class RoomClient {
     this.code = code;
     this.stopped = false;
     this.attempt = 0;
+    this.everOpened = false;
     this.open('connecting');
   }
 
@@ -73,6 +88,7 @@ export class RoomClient {
 
     ws.onopen = () => {
       this.attempt = 0;
+      this.everOpened = true;
       this.onStatus('open');
       this.onOpen();
       this.stopTimers();
@@ -96,6 +112,7 @@ export class RoomClient {
         this.onStatus('closed', e.code);
         return;
       }
+      if (!this.everOpened && this.attempt === 0) this.onFirstOpenFailed();
       this.scheduleRetry();
     };
   }

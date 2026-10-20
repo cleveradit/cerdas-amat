@@ -1,6 +1,7 @@
 <script lang="ts">
   import { DURATIONS, type Duration, type RoomSnapshot, type SeatIndex } from '@cerdas-amat/shared';
   import { id } from '../i18n/id';
+  import { roomLink, shareRoom } from '../lib/share';
   import { stage } from '../lib/stage.svelte';
   import type { ConnectionStatus } from '../net/roomClient';
 
@@ -26,12 +27,29 @@
 
   const isHost = $derived(mySeat === 0);
   const canStart = $derived(room.seats.every((s) => s !== null && s.connected && s.inLobby));
+
+  let shared = $state<'shared' | 'copied' | 'manual' | null>(null);
+  async function share() {
+    shared = await shareRoom(room.code);
+  }
 </script>
 
 <section class="screen">
   <div class="card code-card">
     <p class="field-label">{id.lobby.code}</p>
     <strong class="code">{room.code}</strong>
+    <button type="button" class="share" onclick={share}>{id.lobby.share}</button>
+    {#if shared === 'copied'}
+      <p class="muted" role="status">{id.lobby.copied}</p>
+    {:else if shared === 'manual'}
+      <label class="field-label" for="room-link">{id.lobby.copyManual}</label>
+      <input
+        id="room-link"
+        readonly
+        value={roomLink(room.code)}
+        onfocus={(e) => e.currentTarget.select()}
+      />
+    {/if}
   </div>
   {#if status !== 'open'}<p class="muted" role="status">{id.lobby.reconnecting}</p>{/if}
 
@@ -101,6 +119,13 @@
     flex-direction: column;
     align-items: center;
     background: var(--sun-soft);
+  }
+  .code-card {
+    gap: 8px;
+  }
+  .share {
+    width: auto;
+    padding-inline: 24px;
   }
   .code {
     font-family: var(--display);

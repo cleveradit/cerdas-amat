@@ -1,3 +1,4 @@
+export * from './badWords';
 export * from './deck';
 export * from './names';
 export * from './protocol';

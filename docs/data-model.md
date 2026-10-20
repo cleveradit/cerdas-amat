@@ -37,7 +37,7 @@ Tidak ada database eksternal (keputusan produk no. 5).
 | `RoomState` | `result` / `resultAt` | `{ winner, reason }?` / `number?` | `reason`: `ko`, `time`, `wo`, `surrender`, `void`; `result` dihapus saat fase kembali ke `lobby` atau kursi bergeser |
 | `RoomState` | `emptySince` | `number?` | Epoch ms; diisi saat `init()` dan saat kursi 0 kosong, dihapus saat ada yang masuk |
 | `Seat` | `token` | `string` | `crypto.randomUUID()`; tidak pernah ada di `RoomSnapshot` |
-| `Seat` | `name` | `string` | Di-trim, 1–12 karakter (`NAME_MAX`) |
+| `Seat` | `name` | `string` | Di-trim, 1–12 karakter (`NAME_MAX`); nama yang `isBadName` diganti `randomName()` oleh server |
 | `Seat` | `character` | `Character` | `kucing`, `beruang`, `rubah`, `panda`, `katak` (`CHARACTERS`) |
 | `Seat` | `connected` / `disconnectedAt` | `boolean` / `number?` | Kursi lobby yang terputus dikosongkan setelah 60 detik (`LOBBY_SEAT_HOLD_MS`) |
 | `Seat` | `inLobby` | `boolean` | `false` sejak hasil sampai pemain menekan Kembali ke room; dikeluarkan setelah 30 detik |
@@ -50,5 +50,5 @@ Tidak ada database eksternal (keputusan produk no. 5).
 | `Phase` | `lobby`, `countdown`, `playing`, `paused`, `result` | `room.ts` |
 | `SeatIndex` | `0` (host), `1` (Player 2) | `room.ts` |
 | `ResultReason` | `ko`, `time`, `wo`, `surrender`, `void` | `room.ts` |
-| `ErrorCode` | `ROOM_NOT_FOUND`, `ROOM_FULL`, `NOT_HOST`, `INVALID_MESSAGE` | `protocol.ts` |
-| Close code | `4000` heartbeat (client tersambung ulang), `4400` tidak valid, `4404` room tidak ada, `4409` room penuh | `protocol.ts` |
+| `ErrorCode` | `ROOM_NOT_FOUND`, `ROOM_FULL`, `NOT_HOST`, `INVALID_MESSAGE`, `RATE_LIMITED`, `QUOTA` | `protocol.ts` |
+| Close code | `4000` heartbeat (client tersambung ulang), `4400` tidak valid, `4404` room tidak ada, `4409` room penuh, `4429` terlalu banyak kode salah, `4503` kuota habis | `protocol.ts` |

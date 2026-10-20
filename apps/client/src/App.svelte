@@ -36,6 +36,9 @@
   let playOpen = $state(false);
   let pending = $state(false);
   let error = $state<string | null>(null);
+  // Pesan kuota habis di Menu Utama; bertahan sampai berhasil masuk room.
+  let notice = $state<string | null>(null);
+  let joinLockedUntil = $state(0);
   let room = $state<RoomSnapshot | null>(null);
   let mySeat = $state<SeatIndex>(0);
   let status = $state<ConnectionStatus>('closed');
@@ -66,6 +69,17 @@
       character: profile.character,
     });
   };
+  // Socket gagal terbuka sejak awal: jika Worker sendiri tidak menjawab /api/health,
+  // kuota request Worker habis (Cloudflare membalas halaman error, bukan Worker kita).
+  client.onFirstOpenFailed = async () => {
+    let res: Response;
+    try {
+      res = await fetch('/api/health');
+    } catch {
+      return; // jaringan putus, bukan kuota; percobaan ulang tetap berjalan
+    }
+    if (!res.ok) showQuota();
+  };
   client.onStatus = (s, closeCode) => {
     status = s;
     if (s !== 'closed') return;
@@ -80,6 +94,7 @@
         room = msg.room;
         mySeat = msg.seat;
         myQ = msg.room.qIndex[msg.seat];
+        syncName(msg.room, msg.seat);
         if (msg.room.result && !shownResult) shownResult = captureResult(msg.room, msg.seat);
         // Kembali setelah hasil sudah tidak tersedia: langsung masuk lobby.
         if (msg.room.phase === 'lobby' && !msg.room.seats[msg.seat]?.inLobby) {
@@ -88,12 +103,14 @@
         pending = false;
         playOpen = false;
         error = null;
+        notice = null;
         screen = 'lobby';
         history.replaceState(null, '', `?room=${code}`);
         break;
       case 'room':
         room = msg.room;
         mySeat = msg.seat;
+        syncName(msg.room, msg.seat);
         break;
       case 'countdown':
         screen = 'lobby'; // tutup layar pilih karakter jika sedang terbuka
@@ -138,12 +155,30 @@
         break;
       case 'error':
         error = id.errors[msg.code];
+        if (msg.code === 'QUOTA') notice = error;
+        if (msg.code === 'RATE_LIMITED') joinLockedUntil = Date.now() + 60_000;
         if (pending && (msg.code === 'ROOM_FULL' || msg.code === 'ROOM_NOT_FOUND')) {
           clearToken(code);
         }
         break;
     }
   };
+
+  /** Server bisa mengganti nama (filter kata kasar); profil lokal disamakan. */
+  function syncName(r: RoomSnapshot, seat: SeatIndex) {
+    const name = r.seats[seat]?.name;
+    if (r.phase !== 'lobby' || !name || name === profile.name) return;
+    profile = { ...profile, name };
+    saveProfile(profile);
+  }
+
+  function showQuota() {
+    client.close();
+    pending = false;
+    error = id.errors.QUOTA;
+    notice = id.errors.QUOTA;
+    if (screen === 'lobby') exitRoom();
+  }
 
   function captureResult(r: RoomSnapshot, seat: SeatIndex): ShownResult {
     return {
@@ -176,15 +211,21 @@
   async function createRoom() {
     pending = true;
     error = null;
+    let res: Response;
     try {
-      const res = await fetch('/api/rooms', { method: 'POST' });
-      if (!res.ok) throw new Error(String(res.status));
-      const body = (await res.json()) as { code: string };
-      enterRoom(body.code);
+      res = await fetch('/api/rooms', { method: 'POST' });
     } catch {
       pending = false;
       error = id.errors.createFailed;
+      return;
     }
+    // Bukan JSON = halaman error Cloudflare, artinya Worker tidak jalan (kuota habis).
+    const body = (await res.json().catch(() => null)) as { code?: string; error?: string } | null;
+    if (res.ok && body?.code) return enterRoom(body.code);
+    pending = false;
+    if (body?.error === 'RATE_LIMITED') error = id.errors.createLimited;
+    else if (body === null || body.error === 'QUOTA') showQuota();
+    else error = id.errors.createFailed;
   }
 
   function exitRoom() {
@@ -223,6 +264,7 @@
 <main>
   {#if screen === 'menu'}
     <MenuUtama
+      {notice}
       onPlay={() => {
         error = null;
         playOpen = true;
@@ -263,6 +305,7 @@
   {#if playOpen && screen === 'menu'}
     <ModalPlay
       initialCode={linkCode ?? ''}
+      {joinLockedUntil}
       {pending}
       {error}
       onCreate={createRoom}

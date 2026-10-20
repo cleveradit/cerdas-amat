@@ -16,6 +16,10 @@ export const MAX_INVALID_MESSAGES = 5;
 export const CLOSE_INVALID = 4400;
 export const CLOSE_ROOM_NOT_FOUND = 4404;
 export const CLOSE_ROOM_FULL = 4409;
+/** Terlalu banyak kode room salah dari IP yang sama. */
+export const CLOSE_RATE_LIMITED = 4429;
+/** Kuota Cloudflare plan gratis habis; dikirim Worker tanpa Durable Object. */
+export const CLOSE_QUOTA = 4503;
 /** Ditutup server karena tidak ada ping; client tetap mencoba tersambung ulang. */
 export const CLOSE_HEARTBEAT = 4000;
 
@@ -44,7 +48,8 @@ export const ClientMessageSchema = v.variant('type', [
 
 export type ClientMessage = v.InferOutput<typeof ClientMessageSchema>;
 
-export type ErrorCode = 'ROOM_NOT_FOUND' | 'ROOM_FULL' | 'NOT_HOST' | 'INVALID_MESSAGE';
+export type ErrorCode =
+  'ROOM_NOT_FOUND' | 'ROOM_FULL' | 'NOT_HOST' | 'INVALID_MESSAGE' | 'RATE_LIMITED' | 'QUOTA';
 
 export type ServerMessage =
   | { type: 'welcome'; seat: SeatIndex; token: string; room: RoomSnapshot; serverNow: number }
