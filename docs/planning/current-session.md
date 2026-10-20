@@ -15,6 +15,7 @@
 | 5. Pelengkap | [TICKET-005](Ticket-Implemented/TICKET-005-keamanan-bagikan.md) (keamanan, kuota, Bagikan), [TICKET-006](Ticket-Implemented/TICKET-006-audio-pwa.md) (audio, Pengaturan, PWA) | DONE (PR #6, #7, penutupan PR #8; produksi `0da4d82`, workflow Deploy hijau) |
 | 6. Rilis | — | Backlog |
 | Di luar fase | [TICKET-007](Ticket-Implemented/TICKET-007-rename-cerdas-amat.md) (nama produk diganti menjadi "Cerdas Amat"; identitas teknis `cerdas-amat` dan mekanik tali tetap) | DONE (belum dideploy) |
+| Di luar fase | Tanpa tiket (atas permintaan user): footer "Made by radLabs © 2026" di semua layar kecuali Permainan, `<meta name="author">`, deskripsi manifest PWA | DONE (belum dideploy) |
 
 Alur kerja yang disepakati user:
 

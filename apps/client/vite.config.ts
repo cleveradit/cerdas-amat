@@ -19,6 +19,7 @@ export default defineConfig({
       manifest: {
         name: 'Cerdas Amat',
         short_name: 'Cerdas Amat',
+        description: 'Game adu perkalian 2 pemain oleh radLabs',
         lang: 'id',
         start_url: '/',
         scope: '/',

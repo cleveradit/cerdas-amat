@@ -21,6 +21,7 @@ Lima karakter voxel dari [preview yang disetujui](../initiate-file/karakter-cerd
 | `apps/client/src/lib/stage.svelte.ts` | `stage.current` (`undefined` dimuat, `null` tanpa WebGL), `initStage()`, `showFps` |
 | `apps/client/src/components/Stage3D.svelte` | Memasang `View` ke stage saat mount, melepas saat destroy |
 | `apps/client/src/components/Arena2D.svelte` | Tali 2D saat WebGL tidak tersedia |
+| `apps/client/src/App.svelte` (`<footer>`) | Teks `id.footer` ("Made by radLabs © 2026") di semua layar kecuali Permainan |
 | `apps/client/src/styles/theme.css` | Token warna, font, gaya dasar tombol, input, kartu, modal, avatar, keypad |
 | `e2e/visual.spec.ts` | Satu canvas, avatar, tanpa WebGL, tanpa request ke host lain, layar 320 px |
 | `perf/arena.perf.ts`, `playwright.perf.config.ts` | `pnpm perf` |

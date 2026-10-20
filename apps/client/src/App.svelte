@@ -354,6 +354,10 @@
     />
   {/if}
 
+  {#if !(screen === 'lobby' && room && inGame)}
+    <footer>{id.footer}</footer>
+  {/if}
+
   {#if playOpen && screen === 'menu'}
     <ModalPlay
       initialCode={linkCode ?? ''}
@@ -383,5 +387,11 @@
     padding-block: 16px 24px;
     padding-left: max(16px, env(safe-area-inset-left, 0px));
     padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  footer {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-2);
   }
 </style>

@@ -3,6 +3,7 @@ import type { Character } from '@cerdas-amat/shared';
 /** Semua teks antarmuka (Bahasa Indonesia). */
 export const id = {
   title: 'Cerdas Amat',
+  footer: 'Made by radLabs © 2026',
   menu: {
     play: 'Play',
     settings: 'Pengaturan',
@@ -46,8 +47,7 @@ export const id = {
   lobby: {
     code: 'Kode room',
     share: 'Bagikan',
-    shareText: (code: string) =>
-      `Ayo adu perkalian di Cerdas Amat! Kode room: ${code}`,
+    shareText: (code: string) => `Ayo adu perkalian di Cerdas Amat! Kode room: ${code}`,
     copied: 'Link disalin',
     copyManual: 'Salin link ini:',
     host: 'Host',
