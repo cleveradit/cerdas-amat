@@ -152,12 +152,12 @@
     if (confirm(id.game.confirmLeave)) onLeave();
   }
 
-  // Susunan ala keypad HP; AC setinggi 2 baris mengisi kolom kanan baris kedua.
+  // Susunan ala keypad HP; Enter setinggi 2 baris mengisi kolom kanan baris terakhir.
   const KEYS = [
     ['1', '2', '3', 'ac'],
-    ['4', '5', '6'],
-    ['7', '8', '9', 'del'],
-    ['0', 'enter'],
+    ['4', '5', '6', 'del'],
+    ['7', '8', '9', 'enter'],
+    ['0'],
   ] as const;
   const label = (k: string) =>
     k === 'del' ? id.game.del : k === 'ac' ? id.game.ac : k === 'enter' ? id.game.enter : k;
@@ -225,8 +225,6 @@
           type="button"
           class="key"
           class:fn={k === 'del' || k === 'ac'}
-          class:ac={k === 'ac'}
-          class:del={k === 'del'}
           class:enter={k === 'enter'}
           class:zero={k === '0'}
           aria-label={k === 'del' || k === 'enter' ? label(k) : undefined}

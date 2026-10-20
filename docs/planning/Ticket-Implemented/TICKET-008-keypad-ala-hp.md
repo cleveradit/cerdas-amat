@@ -12,8 +12,8 @@
 | Item | Approved Value |
 |---|---|
 | Susunan angka | Ala keypad HP: `1 2 3` di baris atas, `7 8 9` di baris ketiga (bukan kalkulator `7 8 9` di atas) |
-| Kolom kanan | `AC` (tinggi 2 baris, sejajar baris 1–2), `Hapus` (sejajar `7 8 9`), `Enter` (sejajar `0`, tinggi 1 baris) |
-| Baris bawah | `0` selebar 3 kolom + `Enter` |
+| Kolom kanan | `AC` (sejajar `1 2 3`), `Hapus` (sejajar `4 5 6`), `Enter` (tinggi 2 baris, sejajar `7 8 9` dan `0`) |
+| Baris bawah | `0` selebar 3 kolom + lanjutan `Enter` |
 | Tombol simbol screenshot (`%`, spasi, `@?#`, `,`, `=`, `.`) | Tidak dipakai (jawaban hanya bilangan bulat 1–81) |
 | Gaya visual | Tema terang yang sekarang tetap (PRD: hanya tema terang); `Hapus` dan `Enter` tampil sebagai ikon (⌫, ↵), nama aksesibel tetap `Hapus` / `Enter` |
 | Fungsi tombol & keyboard fisik | Tidak berubah |
@@ -22,8 +22,8 @@ Susunan akhir:
 
 ```
 [ 1 ][ 2 ][ 3 ][ AC ]
-[ 4 ][ 5 ][ 6 ][ AC ]
-[ 7 ][ 8 ][ 9 ][ ⌫  ]
+[ 4 ][ 5 ][ 6 ][ ⌫  ]
+[ 7 ][ 8 ][ 9 ][ ↵  ]
 [      0      ][ ↵  ]
 ```
 
@@ -38,13 +38,12 @@ Keypad permainan disusun seperti keypad angka di HP (1-2-3 di atas) agar terasa 
 ## 3. Non-Negotiable Technical Contract
 
 1. File: `apps/client/src/screens/Permainan.svelte`
-   - `KEYS` menjadi `[['1','2','3','ac'], ['4','5','6'], ['7','8','9','del'], ['0','enter']] as const` (grid auto-placement; `ac` span 2 baris mengisi kolom kanan baris 2).
-   - Tombol mendapat `class:ac={k === 'ac'}` dan `class:del={k === 'del'}` (menggantikan `class:fn` gabungan; `fn` tetap dipakai untuk warna keduanya).
+   - `KEYS` menjadi `[['1','2','3','ac'], ['4','5','6','del'], ['7','8','9','enter'], ['0']] as const` (grid auto-placement; `enter` span 2 baris mengisi kolom kanan baris 4).
+   - Kelas tombol tetap (`fn` untuk AC dan Hapus, `enter`, `zero`).
    - Tombol `del` dan `enter` merender ikon SVG inline (`aria-hidden="true"`) dan `aria-label={label(k)}`; tombol lain tetap menampilkan `label(k)` sebagai teks.
    - `press()`, `onKeydown()`, dan fungsi `label()` tidak berubah.
 2. File: `apps/client/src/styles/theme.css`
-   - `.key.enter`: hapus `grid-row: span 2`.
-   - Tambah `.key.ac { grid-row: span 2; }`.
+   - `.key.enter`: tetap `grid-row: span 2`.
    - `.key.zero { grid-column: span 3; }` tetap.
    - Tambah gaya ikon `.key svg` (ukuran ~22 px, `stroke: currentColor`).
 3. File: `apps/client/src/i18n/id.ts`
@@ -63,7 +62,7 @@ Keypad permainan disusun seperti keypad angka di HP (1-2-3 di atas) agar terasa 
 
 ### B. Gaya
 
-1. Pindahkan span 2 baris dari `Enter` ke `AC` di `theme.css`.
+1. `Enter` tetap span 2 baris di `theme.css`; tambah gaya ikon.
 
 ### C. Dokumen
 
@@ -76,7 +75,7 @@ Keypad permainan disusun seperti keypad angka di HP (1-2-3 di atas) agar terasa 
 
 | Case | Input | Expected Result | Status |
 |---|---|---|---|
-| Susunan | Buka layar permainan | Baris atas `1 2 3 AC`, baris 3 `7 8 9 ⌫`, baris bawah `0` lebar + `↵` | `[x]` |
+| Susunan | Buka layar permainan | Baris atas `1 2 3 AC`, baris 2 `4 5 6 ⌫`, `↵` setinggi baris 3–4, baris bawah `0` lebar | `[x]` |
 | Fungsi tetap | Tekan `4`, `2`, ⌫, `2`, ↵ untuk soal 6×7 | Jawaban 42 terkirim, skor naik | `[x]` |
 | Nama aksesibel | `getByRole('button', { name: 'Enter' })` dan `{ name: 'Hapus' }` | Keduanya ditemukan (e2e lama tetap lolos) | `[x]` |
 | Boundary: layar 320 px | e2e `layar 320 px` | Keypad dan Enter terlihat penuh, tanpa scroll horizontal | `[x]` |

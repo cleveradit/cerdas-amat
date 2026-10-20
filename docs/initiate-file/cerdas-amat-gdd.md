@@ -125,8 +125,8 @@ Susunan ala keypad angka HP (1-2-3 di atas). Hapus dan Enter tampil sebagai ikon
 
 ```
 [ 1 ][ 2 ][ 3 ][ AC ]
-[ 4 ][ 5 ][ 6 ][ AC ]
-[ 7 ][ 8 ][ 9 ][ ⌫  ]
+[ 4 ][ 5 ][ 6 ][ ⌫  ]
+[ 7 ][ 8 ][ 9 ][ ↵  ]
 [      0      ][ ↵  ]
 ```
 

@@ -258,9 +258,6 @@ select {
   font-weight: 700;
   font-size: 14px;
 }
-.key.ac {
-  grid-row: span 2;
-}
 .key svg {
   display: block;
   width: 24px;
@@ -273,6 +270,7 @@ select {
   stroke-linejoin: round;
 }
 .key.enter {
+  grid-row: span 2;
   background: var(--sun);
   font-family: var(--body);
   font-weight: 700;
