@@ -1,4 +1,4 @@
-# Cerdas Amat (Tarik Tambang Matematika) — Claude Code Context
+# Cerdas Amat — Claude Code Context
 
 @docs/ai-context.md
 

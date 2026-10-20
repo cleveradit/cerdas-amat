@@ -1,6 +1,6 @@
 /**
  * Helper pembuat model voxel, port langsung dari preview karakter yang disetujui
- * (docs/initiate-file/karakter-tarik-tambang.html). Tanpa Three.js agar bisa dites di Node.
+ * (docs/initiate-file/karakter-cerdas-amat.html). Tanpa Three.js agar bisa dites di Node.
  */
 
 export type Part = 'head' | 'body' | 'armL' | 'armR' | 'legL' | 'legR' | 'tail';

@@ -1,6 +1,6 @@
 # Architecture Map
 
-**Status:** Sebagian rencana. Kerangka monorepo, CI/CD (Fase 1), room dan lobby (Fase 2), gameplay (Fase 3: fase permainan, jeda, hasil, layar Permainan/Hasil, tes Playwright), visual (Fase 4: karakter voxel, renderer bersama, arena 3D, tema UI), dan Fase 5 (filter nama, rate limit, cek Origin, kuota habis, Bagikan, audio, Pengaturan, PWA, pesan offline) sudah ada; uji di perangkat nyata (Fase 6) belum. Komponen lain diturunkan dari [PRD Teknis](initiate-file/tarik-tambang-matematika-prd.md) dan wajib diverifikasi ulang terhadap kode setelah tiap fase selesai.
+**Status:** Sebagian rencana. Kerangka monorepo, CI/CD (Fase 1), room dan lobby (Fase 2), gameplay (Fase 3: fase permainan, jeda, hasil, layar Permainan/Hasil, tes Playwright), visual (Fase 4: karakter voxel, renderer bersama, arena 3D, tema UI), dan Fase 5 (filter nama, rate limit, cek Origin, kuota habis, Bagikan, audio, Pengaturan, PWA, pesan offline) sudah ada; uji di perangkat nyata (Fase 6) belum. Komponen lain diturunkan dari [PRD Teknis](initiate-file/cerdas-amat-prd.md) dan wajib diverifikasi ulang terhadap kode setelah tiap fase selesai.
 
 ## Summary
 
@@ -10,7 +10,7 @@ Satu Cloudflare Worker menyajikan client (SPA + PWA), membuat room, dan menerusk
 
 | Component | Responsibility | Code location | Dependencies |
 |---|---|---|---|
-| Client | Layar (menu, pengaturan, pilih karakter, lobby, permainan, hasil), keypad, render voxel dengan satu `WebGLRenderer` bersama yang di-import dinamis (diport dari [preview karakter](initiate-file/karakter-tarik-tambang.html), lihat [visual](features/visual.md)), audio, PWA, localStorage | `apps/client/` | Svelte 5, Vite, Three.js, vite-plugin-pwa, `packages/shared` |
+| Client | Layar (menu, pengaturan, pilih karakter, lobby, permainan, hasil), keypad, render voxel dengan satu `WebGLRenderer` bersama yang di-import dinamis (diport dari [preview karakter](initiate-file/karakter-cerdas-amat.html), lihat [visual](features/visual.md)), audio, PWA, localStorage | `apps/client/` | Svelte 5, Vite, Three.js, vite-plugin-pwa, `packages/shared` |
 | Worker | Aset statis, `POST /api/rooms` (buat room + rate limit), `GET /ws/:code` (cek Origin, upgrade WebSocket), tangkap error kuota | `apps/worker/src/index.ts` | Durable Object `Room`, binding Rate Limiting |
 | Durable Object `Room` | State room otoritatif, protokol pesan, alarm tunggal, persistensi ke storage SQLite, heartbeat | `apps/worker/src/room.ts` | WebSocket Hibernation API, `packages/shared` |
 | Shared | Tipe pesan, skema Valibot, `makeDeck`, aturan hasil, filter nama, pembuat kode room | `packages/shared/` | Valibot |

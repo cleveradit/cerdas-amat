@@ -47,4 +47,4 @@ Host menekan Mulai, server memasang hitung mundur 3 detik dan mengirim deck 162 
 
 - [room-lobby.md](room-lobby.md)
 - [data-model.md](../data-model.md)
-- [PRD Teknis](../initiate-file/tarik-tambang-matematika-prd.md)
+- [PRD Teknis](../initiate-file/cerdas-amat-prd.md)

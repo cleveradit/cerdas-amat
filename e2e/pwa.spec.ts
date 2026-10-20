@@ -8,8 +8,8 @@ test('manifest: standalone, portrait, ikon 192 dan 512 tersaji', async ({ reques
   expect(res.status()).toBe(200);
   const manifest = await res.json();
   expect(manifest).toMatchObject({
-    name: 'Tarik Tambang Matematika',
-    short_name: 'Tarik Tambang',
+    name: 'Cerdas Amat',
+    short_name: 'Cerdas Amat',
     display: 'standalone',
     orientation: 'portrait',
     lang: 'id',
@@ -36,7 +36,7 @@ test('service worker aktif; reload saat offline tetap menampilkan menu', async (
 
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Tarik Tambang Matematika' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Cerdas Amat' })).toBeVisible();
   await expect(page.getByRole('alert')).toHaveText('Butuh koneksi internet untuk bermain');
   await expect(page.getByRole('button', { name: 'Play' })).toBeDisabled();
 });

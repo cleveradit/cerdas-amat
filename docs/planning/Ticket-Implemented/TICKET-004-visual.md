@@ -11,7 +11,7 @@
 
 | Item | Approved Value |
 |---|---|
-| Lingkup | Fase 4 PRD: 5 karakter voxel dari [preview](../initiate-file/karakter-tarik-tambang.html), arena 3D, layar pilih karakter dengan preview berputar, avatar, pose Menang/Kalah/Diam di layar hasil. **Tambahan dari PRD:** gaya UI umum semua layar (menu, modal Play, pilih karakter, lobby, permainan, hasil) |
+| Lingkup | Fase 4 PRD: 5 karakter voxel dari [preview](../initiate-file/karakter-cerdas-amat.html), arena 3D, layar pilih karakter dengan preview berputar, avatar, pose Menang/Kalah/Diam di layar hasil. **Tambahan dari PRD:** gaya UI umum semua layar (menu, modal Play, pilih karakter, lobby, permainan, hasil) |
 | Gaya UI | Ikuti preview (dipilih user): garis tinta 3 px `--ink #1F2A33`, bayangan keras `0 3px 0`, latar langit (`--sky #CFEBF7`, `--sky-2 #EEF7FB`, `--sky-deep #9FD3EC`), aksen `--sun #FFC83D`, host `--host #2F6FD0`, Player 2 `--p2 #DD4449`. Hanya tema terang (`color-scheme: light`), sama dengan preview |
 | Font | Lilita One (judul, angka, keypad) dan Rubik 400/500/600/700 (teks), lewat paket `@fontsource/lilita-one` dan `@fontsource/rubik` yang di-bundle Vite, jadi di-host sendiri bersama aset. Tidak ada request ke Google Fonts atau CDN lain |
 | Three.js | Paket `three ^0.186.1` + `@types/three`, di-import dinamis setelah menu tampil supaya layar pertama tetap ringan |
@@ -71,7 +71,7 @@ Mengubah tampilan sementara Fase 3 menjadi tampilan game sebenarnya: karakter vo
    - Dependency `three`, `@fontsource/lilita-one`, `@fontsource/rubik`; devDependency `@types/three`, `vitest`; script `test` = `vitest run`.
 10. File: `e2e/visual.spec.ts`, `playwright.perf.config.ts`, `perf/arena.perf.ts`, `package.json` (root)
     - Script root ``"perf": "playwright test -c playwright.perf.config.ts"``. `pnpm e2e` tidak menjalankan tes perf.
-11. File: `docs/initiate-file/tarik-tambang-matematika-prd.md`
+11. File: `docs/initiate-file/cerdas-amat-prd.md`
     - Fase 4 ditambah gaya UI umum; syarat lolos Fase 4 diganti ke `pnpm perf` (baris "Syarat lolos fps"); bagian Client ditambah gaya UI, font, dan kalibrasi warna. Kalimat lama dihapus.
 
 Rules:

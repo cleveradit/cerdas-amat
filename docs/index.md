@@ -1,6 +1,6 @@
 # Cerdas Amat — Documentation Hub
 
-Hub dokumentasi project Cerdas Amat: game web 2 pemain realtime "Tarik Tambang Matematika" (perkalian 1–9 × 1–9, selisih 5 jawaban benar = KO) di `cerdas-amat.radlabs.my.id`. Ditulis agar mudah dicerna developer maupun AI agent.
+Hub dokumentasi project Cerdas Amat: game web 2 pemain realtime (perkalian 1–9 × 1–9, selisih 5 jawaban benar = KO) di `cerdas-amat.radlabs.my.id`. Ditulis agar mudah dicerna developer maupun AI agent.
 
 **Stack:** TypeScript · Svelte 5 + Vite · Three.js · Cloudflare Workers + Durable Objects (SQLite) · Valibot · pnpm workspaces
 
@@ -15,9 +15,9 @@ Reading order to understand the project without reading code:
 
 ## Dokumen produk
 
-- **[GDD](initiate-file/tarik-tambang-matematika-gdd.md)** — aturan main, alur layar, tampilan arena, audio.
-- **[PRD Teknis](initiate-file/tarik-tambang-matematika-prd.md)** — keputusan produk, arsitektur, protokol pesan, kuota, rencana 6 fase.
-- **[Preview karakter](initiate-file/karakter-tarik-tambang.html)** — prototipe HTML yang disetujui: data voxel 5 karakter, 5 animasi, uji arena di layar 360 px.
+- **[GDD](initiate-file/cerdas-amat-gdd.md)** — aturan main, alur layar, tampilan arena, audio.
+- **[PRD Teknis](initiate-file/cerdas-amat-prd.md)** — keputusan produk, arsitektur, protokol pesan, kuota, rencana 6 fase.
+- **[Preview karakter](initiate-file/karakter-cerdas-amat.html)** — prototipe HTML yang disetujui: data voxel 5 karakter, 5 animasi, uji arena di layar 360 px.
 
 ## Process & Planning
 

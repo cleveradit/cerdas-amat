@@ -17,8 +17,8 @@ export default defineConfig({
       // Ikon sudah ikut lewat globPatterns (png); tanpa ini tercatat dua kali di precache.
       includeManifestIcons: false,
       manifest: {
-        name: 'Tarik Tambang Matematika',
-        short_name: 'Tarik Tambang',
+        name: 'Cerdas Amat',
+        short_name: 'Cerdas Amat',
         lang: 'id',
         start_url: '/',
         scope: '/',

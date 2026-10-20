@@ -2,7 +2,7 @@ import type { Character } from '@cerdas-amat/shared';
 
 /** Semua teks antarmuka (Bahasa Indonesia). */
 export const id = {
-  title: 'Tarik Tambang Matematika',
+  title: 'Cerdas Amat',
   menu: {
     play: 'Play',
     settings: 'Pengaturan',
@@ -47,7 +47,7 @@ export const id = {
     code: 'Kode room',
     share: 'Bagikan',
     shareText: (code: string) =>
-      `Ayo adu perkalian di Tarik Tambang Matematika! Kode room: ${code}`,
+      `Ayo adu perkalian di Cerdas Amat! Kode room: ${code}`,
     copied: 'Link disalin',
     copyManual: 'Salin link ini:',
     host: 'Host',

@@ -70,7 +70,7 @@ Membuat room multiplayer yang benar-benar jalan: pemain bisa membuat room, memba
    - Kirim teks `ping` tiap 5 detik selama tersambung.
 8. File: `apps/client/src/` — `App.svelte`, `screens/MenuUtama.svelte`, `screens/ModalPlay.svelte`, `screens/PilihKarakter.svelte`, `screens/Lobby.svelte`, `lib/storage.ts`, `i18n/id.ts`
    - Semua teks UI dari `id.ts` (Rule 4). Durasi dan kontrol host hanya tampil untuk kursi 0.
-9. File: `docs/initiate-file/tarik-tambang-matematika-prd.md`
+9. File: `docs/initiate-file/cerdas-amat-prd.md`
    - Change: tabel endpoint (`GET /ws/:code`), tabel pesan `error`, dan paragraf persistensi diperbarui sesuai dua keputusan "Berbeda dari PRD" / "Tambahan dari PRD" di atas; kalimat lama dihapus.
 
 Rules:

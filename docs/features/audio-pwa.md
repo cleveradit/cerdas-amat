@@ -28,7 +28,7 @@ Game memutar 2 musik latar dan 8 efek suara lewat Web Audio API (satu `AudioCont
 
 | PWA | Nilai |
 |---|---|
-| Manifest | `name` "Tarik Tambang Matematika", `short_name` "Tarik Tambang", `lang` `id`, `display` `standalone`, `orientation` `portrait`, warna `#CFEBF7` |
+| Manifest | `name` "Cerdas Amat", `short_name` "Cerdas Amat", `lang` `id`, `display` `standalone`, `orientation` `portrait`, warna `#CFEBF7` |
 | Ikon | `public/icons/`: `icon-192.png`, `icon-512.png` (sudut membulat), `icon-512-maskable.png`, `apple-touch-icon-180.png`; sumber `apps/client/pwa/icon.svg` |
 | Precache | `**/*.{js,css,html,png,svg,woff2,mp3}` (sekitar 2,5 MB, 50 file) |
 | Navigasi | `navigateFallback` `/index.html`, kecuali `/api/` dan `/ws/` |
@@ -57,4 +57,4 @@ Game memutar 2 musik latar dan 8 efek suara lewat Web Audio API (satu `AudioCont
 - [visual](visual.md)
 - [keamanan](keamanan.md)
 - [data-model.md](../data-model.md)
-- [PRD Teknis](../initiate-file/tarik-tambang-matematika-prd.md)
+- [PRD Teknis](../initiate-file/cerdas-amat-prd.md)

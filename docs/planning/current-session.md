@@ -2,7 +2,7 @@
 
 ## Active Ticket
 
-— (tidak ada tiket aktif; TICKET-005 dan TICKET-006 `DONE` dan sudah diarsipkan)
+— (tidak ada tiket aktif; TICKET-007 `DONE` dan sudah diarsipkan)
 
 ## Progress
 
@@ -14,6 +14,7 @@
 | 4. Visual | [TICKET-004](Ticket-Implemented/TICKET-004-visual.md) | DONE (PR #5) |
 | 5. Pelengkap | [TICKET-005](Ticket-Implemented/TICKET-005-keamanan-bagikan.md) (keamanan, kuota, Bagikan), [TICKET-006](Ticket-Implemented/TICKET-006-audio-pwa.md) (audio, Pengaturan, PWA) | DONE (PR #6, #7, penutupan PR #8; produksi `0da4d82`, workflow Deploy hijau) |
 | 6. Rilis | — | Backlog |
+| Di luar fase | [TICKET-007](Ticket-Implemented/TICKET-007-rename-cerdas-amat.md) (nama produk diganti menjadi "Cerdas Amat"; identitas teknis `cerdas-amat` dan mekanik tali tetap) | DONE (belum dideploy) |
 
 Alur kerja yang disepakati user:
 

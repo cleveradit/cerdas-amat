@@ -1,10 +1,10 @@
-# Tarik Tambang Matematika — PRD Teknis
+# Cerdas Amat — PRD Teknis
 
 Tanggal: 19 Oktober 2026 · Penulis: Radityo Dwiki
 
 ## Ringkasan dan lingkup
 
-Tarik Tambang Matematika adalah game web 2 pemain realtime di cerdas-amat.radlabs.my.id: pemain beradu menjawab perkalian 1–9 × 1–9, dan selisih 5 jawaban benar berarti KO. Seluruh sistem berjalan di plan gratis Cloudflare, tanpa akun dan tanpa database. Dokumen ini melengkapi GDD (aturan main dan alur layar) dengan detail teknis untuk membangunnya.
+Cerdas Amat adalah game web 2 pemain realtime di cerdas-amat.radlabs.my.id: pemain beradu menjawab perkalian 1–9 × 1–9, dan selisih 5 jawaban benar berarti KO. Seluruh sistem berjalan di plan gratis Cloudflare, tanpa akun dan tanpa database. Dokumen ini melengkapi GDD (aturan main dan alur layar) dengan detail teknis untuk membangunnya.
 
 **Masuk v1:**
 

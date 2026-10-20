@@ -6,7 +6,7 @@ All AI agents MUST read and follow these rules before proposing or implementing 
 
 **Documentation language:** Indonesian (technical terms stay in English)
 
-**Sumber kebenaran produk:** [GDD](initiate-file/tarik-tambang-matematika-gdd.md) (aturan main, alur layar) dan [PRD Teknis](initiate-file/tarik-tambang-matematika-prd.md) (arsitektur, protokol, kuota, rencana fase), serta [preview karakter yang disetujui](initiate-file/karakter-tarik-tambang.html) (data voxel 5 karakter, animasi, tata letak arena). Keputusan produk di tabel "Keputusan produk" PRD sudah final; mengubahnya butuh persetujuan eksplisit user, lalu ditulis langsung di PRD/GDD dengan menghapus keputusan lama (bukan lewat decision log). Bila GDD dan PRD bertentangan, PRD yang berlaku (GDD ditulis sebelum keputusan teknis).
+**Sumber kebenaran produk:** [GDD](initiate-file/cerdas-amat-gdd.md) (aturan main, alur layar) dan [PRD Teknis](initiate-file/cerdas-amat-prd.md) (arsitektur, protokol, kuota, rencana fase), serta [preview karakter yang disetujui](initiate-file/karakter-cerdas-amat.html) (data voxel 5 karakter, animasi, tata letak arena). Keputusan produk di tabel "Keputusan produk" PRD sudah final; mengubahnya butuh persetujuan eksplisit user, lalu ditulis langsung di PRD/GDD dengan menghapus keputusan lama (bukan lewat decision log). Bila GDD dan PRD bertentangan, PRD yang berlaku (GDD ditulis sebelum keputusan teknis).
 
 ---
 

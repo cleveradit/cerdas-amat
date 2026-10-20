@@ -1,4 +1,4 @@
-# Tarik Tambang Matematika — Game Design Document
+# Cerdas Amat — Game Design Document
 
 Tanggal: 19 Oktober 2026
 

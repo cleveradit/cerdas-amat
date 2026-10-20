@@ -49,4 +49,4 @@ Pemain membuat room lewat `POST /api/rooms`, lalu semua pemain tersambung ke Dur
 
 - [data-model.md](../data-model.md)
 - [architecture.md](../architecture.md)
-- [PRD Teknis](../initiate-file/tarik-tambang-matematika-prd.md)
+- [PRD Teknis](../initiate-file/cerdas-amat-prd.md)

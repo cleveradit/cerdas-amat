@@ -46,4 +46,4 @@ Nama pemain disaring dari kata kasar di client (umpan balik cepat) dan di server
 
 - [room-lobby.md](room-lobby.md)
 - [data-model.md](../data-model.md)
-- [PRD Teknis](../initiate-file/tarik-tambang-matematika-prd.md)
+- [PRD Teknis](../initiate-file/cerdas-amat-prd.md)

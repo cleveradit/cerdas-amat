@@ -78,7 +78,7 @@ Menutup celah penyalahgunaan sebelum rilis publik (nama kasar, spam room, tebak 
     - Tombol Bagikan di bawah kode room; hasil `copied` → "Link disalin"; `manual` → input read-only berisi link.
 13. File: `apps/client/src/i18n/id.ts`
     - Teks baru: tombol Bagikan, "Link disalin", nama ditolak, `errors.RATE_LIMITED`, `errors.QUOTA` (teks PRD), batas buat room (teks PRD), hitung mundur kunci kode.
-14. File: `docs/initiate-file/tarik-tambang-matematika-prd.md`
+14. File: `docs/initiate-file/cerdas-amat-prd.md`
     - Close code aplikasi ditambah `4429` dan `4503`; aturan Origin ditulis sebagai "host Origin sama dengan host request"; kalimat lama dihapus.
 
 Rules:

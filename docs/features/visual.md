@@ -4,7 +4,7 @@
 
 ## Summary
 
-Lima karakter voxel dari [preview yang disetujui](../initiate-file/karakter-tarik-tambang.html) tampil di layar pilih karakter (preview berputar), slot lobby dan deretan avatar (gambar statis), arena permainan, dan layar hasil (pose Menang/Kalah/Diam). Satu `WebGLRenderer` dipakai bergantian oleh semua layar; canvas-nya dipindah ke layar yang sedang tampil. Semua layar memakai tema global dari preview (garis tinta, bayangan keras, latar langit, font Lilita One dan Rubik). Tanpa WebGL, permainan tetap jalan dengan tali 2D.
+Lima karakter voxel dari [preview yang disetujui](../initiate-file/karakter-cerdas-amat.html) tampil di layar pilih karakter (preview berputar), slot lobby dan deretan avatar (gambar statis), arena permainan, dan layar hasil (pose Menang/Kalah/Diam). Satu `WebGLRenderer` dipakai bergantian oleh semua layar; canvas-nya dipindah ke layar yang sedang tampil. Semua layar memakai tema global dari preview (garis tinta, bayangan keras, latar langit, font Lilita One dan Rubik). Tanpa WebGL, permainan tetap jalan dengan tali 2D.
 
 ## Quick Reference
 
@@ -62,4 +62,4 @@ Lima karakter voxel dari [preview yang disetujui](../initiate-file/karakter-tari
 
 - [gameplay.md](gameplay.md)
 - [architecture.md](../architecture.md)
-- [PRD Teknis](../initiate-file/tarik-tambang-matematika-prd.md)
+- [PRD Teknis](../initiate-file/cerdas-amat-prd.md)

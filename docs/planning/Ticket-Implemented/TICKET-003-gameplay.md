@@ -69,7 +69,7 @@ Membuat game bisa dimainkan dari awal sampai akhir: host menekan Mulai, kedua pe
    - `webServer: { command: 'pnpm dev', url: 'http://localhost:5173', reuseExistingServer: !process.env.CI }`.
 8. File: `.github/workflows/ci.yml`, `.github/workflows/deploy.yml`
    - Langkah `pnpm exec playwright install --with-deps chromium` lalu `pnpm e2e` setelah `pnpm build`, sebelum deploy.
-9. File: `docs/initiate-file/tarik-tambang-matematika-prd.md`
+9. File: `docs/initiate-file/cerdas-amat-prd.md`
    - Tabel pesan, aturan jeda, dan paragraf persistensi diperbarui sesuai baris "Tambahan dari PRD" dan "Memperjelas PRD" di atas; kalimat lama dihapus.
 
 Rules:
